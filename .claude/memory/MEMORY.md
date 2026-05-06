@@ -8,7 +8,7 @@ future agent would need to avoid re-litigating.
 ## Core Facts
 
 - **Language / Stack:** Python 3.11+, pydantic>=2.0, lxml>=4.9.2, json-schema-to-pydantic>=0.4, uv
-- **Current phase:** Phase 00 — Foundation (complete)
+- **Current phase:** Phase 01 — Core Pipeline (complete)
 - **Framework version:** 0.3.0
 - **Roadmap:** `docs/planning/PROJECT_ROADMAP.md`
 - **ADRs:** `docs/adr/` — read before touching any component
