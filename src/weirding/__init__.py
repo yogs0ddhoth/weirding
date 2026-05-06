@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Protocol, overload, runtime_checkable
+import re
+from typing import Any, Protocol, overload, runtime_checkable
 
+from lxml import etree
 from pydantic import BaseModel
+from pydantic import ValidationError as PydanticValidationError
 
 from weirding._exceptions import (
     ParseError,
@@ -10,9 +13,10 @@ from weirding._exceptions import (
     UnsupportedDialectError,
     WeirdingError,
 )
-
-if TYPE_CHECKING:
-    pass
+from weirding._parser import make_parser
+from weirding._schema import compile_schema
+from weirding._serializers import _xml_to_dict
+from weirding._serializers import to_xml as _to_xml
 
 __all__ = [
     "DTOBuilder",
@@ -28,6 +32,15 @@ __all__ = [
     "parse",
     "to_xml",
 ]
+
+_NAME_RE = re.compile(r"[^A-Za-z0-9_]")
+_LEADING_DIGITS_RE = re.compile(r"^[0-9]+")
+
+
+def _sanitize_name(tag: str) -> str:
+    name = _NAME_RE.sub("_", tag)
+    name = _LEADING_DIGITS_RE.sub("", name)
+    return name or "Model"
 
 
 @runtime_checkable
@@ -92,7 +105,7 @@ def compile(xml: str | bytes) -> dict:
         UnsupportedDialectError: dialect cannot be detected or is unsupported.
         ParseError: xml is not well-formed.
     """
-    raise NotImplementedError
+    return compile_schema(xml)
 
 
 @overload
@@ -129,7 +142,7 @@ def from_schema(
     Raises:
         SchemaError: schema cannot be converted to a valid typed class.
     """
-    raise NotImplementedError
+    return (builder or PydanticBuilder()).build(schema, name=name)
 
 
 def define_model(
@@ -150,7 +163,9 @@ def define_model(
     Returns:
         A new type produced by the builder.
     """
-    raise NotImplementedError
+    schema = compile(xml)
+    name = _sanitize_name(schema.get("title", "Model"))
+    return from_schema(schema, name=name, builder=builder)
 
 
 def parse(xml: str | bytes, model: type[Validatable]) -> Any:
@@ -170,7 +185,20 @@ def parse(xml: str | bytes, model: type[Validatable]) -> Any:
     Raises:
         ParseError: xml is malformed or fails model validation.
     """
-    raise NotImplementedError
+    parser = make_parser()
+    try:
+        if isinstance(xml, str):
+            root = etree.fromstring(xml.encode(), parser=parser)
+        else:
+            root = etree.fromstring(xml, parser=parser)
+    except etree.XMLSyntaxError as exc:
+        raise ParseError(str(exc)) from exc
+
+    data = _xml_to_dict(root, model)  # type: ignore[arg-type]
+    try:
+        return model.model_validate(data)
+    except PydanticValidationError as exc:
+        raise ParseError(str(exc)) from exc
 
 
 def to_xml(instance: BaseModel) -> str:
@@ -189,4 +217,4 @@ def to_xml(instance: BaseModel) -> str:
     Returns:
         UTF-8 XML string without an XML declaration.
     """
-    raise NotImplementedError
+    return _to_xml(instance)
