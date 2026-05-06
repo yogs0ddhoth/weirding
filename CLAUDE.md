@@ -1,13 +1,4 @@
-# {{PROJECT_NAME}}
-
-<!-- TEMPLATE INSTRUCTIONS (delete this block when filling in)
-  This is a Melange project framework. Replace every {{PLACEHOLDER}} with your
-  project-specific content. Sections marked [UNIVERSAL] encode production-grade discipline
-  that applies to any stack — do not change them without a strong reason.
-
-  Once filled in, this file is git-tracked and injected into every Claude Code session
-  by the hook in .claude/hooks/inject_claude_md.sh. Keep it accurate and concise.
--->
+# weirding
 
 @AGENTS.md
 @ETHOS.md
@@ -15,7 +6,7 @@
 
 ## Project
 
-{{PROJECT_DESCRIPTION}}
+weirding is a production-grade Python library for XML ↔ Pydantic v2 conversion. It provides `compile(xml)` to convert XML schema documents — using a plain-attribute annotation convention or XSD — into a JSON Schema IR dict, `define_model(xml)` to compile that IR into Pydantic v2 `BaseModel` classes, `parse(xml, model)` to validate and bind XML data against those models, and `to_xml(instance)` for round-trip serialization. Includes prompt engineering utilities (`prompt.to_template()`, `prompt.format_error()`, `RetryContext`) purpose-built for the Claude structured output workflow. Designed for Databricks, Kubernetes, serverless, and edge environments.
 
 ## Commands
 
@@ -24,12 +15,11 @@ runnable — no prose, no approximations.
 
 | Command    | Value                          |
 |------------|--------------------------------|
-| Build      | {{BUILD_COMMAND}}              |
-| Test       | {{TEST_COMMAND}}               |
-| Lint       | {{LINT_COMMAND}}               |
-| Format     | {{FORMAT_COMMAND}}             |
-| Deploy     | {{DEPLOY_COMMAND}}             |
-| Docs       | {{DOCS_COMMAND}}               |
+| Build      | uv sync --extra dev            |
+| Test       | uv run pytest                  |
+| Lint       | uv run ruff check .            |
+| Format     | uv run ruff format .           |
+| Deploy     | uv publish                     |
 
 ## Development Workflow [UNIVERSAL]
 
@@ -56,7 +46,7 @@ The orchestrator session should only:
 Anti-pattern (NEVER DO THIS):
 ```
 # Do not run long builds or test suites in the main session
-{{TEST_COMMAND}} 2>&1 | grep ...
+uv run pytest 2>&1 | head ...
 ```
 
 Correct pattern:
@@ -101,16 +91,15 @@ any change.
 
 | File | Reason |
 |------|--------|
-| {{AUTH_FILE}} | Authentication — security critical |
-| {{CORE_DATA_MODEL_FILE}} | Core data model — changes affect the entire system |
-| {{PRIVACY_FILE}} | Privacy guarantees — PII logging risk |
+| `src/weirding/_parser.py` | Secure XML parsing — XMLParser configuration is the primary security boundary |
+| `src/weirding/__init__.py` | Public API surface — any change here is a potential breaking change |
 
 ### Tier 2 — Explain why alternative approaches are insufficient
 
 | File | Reason |
 |------|--------|
-| {{HOT_PATH_FILE}} | Performance hot path — any change affects user-facing latency |
-| {{MIGRATION_FILE}} | Schema migration — hard to reverse, affects production data |
+| `src/weirding/_schema.py` | r: namespace → JSON Schema IR pipeline — hot path for all schema compilation |
+| `src/weirding/_models.py` | JSON Schema → Pydantic model engine — changes risk silent model generation regressions |
 
 ## Quality Requirements [UNIVERSAL]
 

@@ -4,6 +4,14 @@
     "github",
     "git"
   ],
+  "permissions": {
+    "allow": [
+      "Bash(uv sync --extra dev)",
+      "Bash(uv run pytest)",
+      "Bash(uv run ruff check .)",
+      "Bash(uv run ruff format .)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

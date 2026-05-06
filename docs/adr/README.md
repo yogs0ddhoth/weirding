@@ -1,40 +1,23 @@
 # Architecture Decision Records
 
-ADRs explain *why* this project is designed the way it is. They are the authoritative
-record of reasoning that would otherwise appear arbitrary to a future reader or agent.
+ADRs explain *why* this project is designed the way it is.
 
 ## How to Read ADRs
 
 Read ADRs before touching a component — not to discover current state, but to understand
-why the constraints exist. If you are about to make a change that seems to violate an
-existing constraint, check whether there is an ADR explaining why the constraint was put
-there.
-
-Current state lives in `.claude/memory/MEMORY.md`. ADRs explain the *why*.
+why the constraints exist.
 
 ## How to Write an ADR
 
-Use the `/adr` command or invoke the `adr-authoring` skill directly. Copy `template.md`
-to `NNNN-short-title.md` and fill it in.
-
-An ADR is required when a decision involves:
-- Trade-offs between two credible alternatives
-- Cross-component impact
-- Changes to protected files or core interfaces
-- Anything hard to reverse
-
-ADRs are append-only. If a decision is superseded, write a new ADR and update the
-status line of the old one. Never delete or edit the content of a past ADR.
+Use the `/adr` command. Copy `template.md` to `NNNN-short-title.md` and fill it in.
+ADRs are append-only.
 
 ## Index
 
 | # | Title | Status | Date | Summary |
 |---|-------|--------|------|---------|
-| — | — | — | — | No ADRs yet. |
-
----
-
-> **Template note:** If you are working on the Melange template itself (not an initialized
-> project), template-layer ADRs about Melange's own design live in `docs/adr/melange/`.
-> This directory is deleted during `/init` so initialized projects always start with a
-> clean ADR index.
+| 0001 | [Schema Annotation Convention](0001-schema-annotation-convention.md) | Accepted | 2026-05-06 | Plain unnamespaced attributes on XML elements; `data-*` and namespace-prefixed rejected; XSD rejected as primary format |
+| 0002 | [JSON Schema IR as Public API](0002-json-schema-ir-as-public-api.md) | Accepted | 2026-05-06 | `compile()` returns a public JSON Schema dict; `from_schema()` also public for non-XML callers |
+| 0003 | [Validatable Protocol for parse()](0003-validatable-protocol.md) | Accepted | 2026-05-06 | `parse()` accepts any `Validatable` Protocol, not just Pydantic `BaseModel`, enabling non-Pydantic backends |
+| 0004 | [json-schema-to-pydantic Engine](0004-json-schema-to-pydantic-engine.md) | Accepted | 2026-05-06 | Runtime model builder; two weirding patches: `additionalProperties`→`extra="forbid"`, `prefixItems` banned from IR |
+| 0005 | [x-weirding-item-tag Extension Key](0005-x-weirding-item-tag.md) | Accepted | 2026-05-06 | Array fields carry child tag name in IR as `x-*` extension key for round-trip serialization fidelity |

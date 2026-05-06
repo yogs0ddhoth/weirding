@@ -1,206 +1,209 @@
-# IMPLEMENTATION PLAN: MCP Server Environment Fix
+# Plan: Phase 00 Close-out + Phase 01 Core Pipeline
 
-**Feature:** MCP server fix — template-only: gitignore, hook fix, token docs, SETUP.md prereqs, TEMPLATE.md upgrade path enablement  
-**Branch to create:** `melange/mcp-server-fix` (from `main`)  
-**Complexity:** S  
-**Date:** 2026-05-05
+Planner verdict: **PROCEED WITH MODIFICATIONS** (incorporated below)
 
----
-
-## Context
-
-Two of three MCP servers (`github`, `context-creator`) fail in every new Claude Code session:
-- `github`: `${GITHUB_TOKEN}` in `.mcp.json` requires the env var in the process environment at launch; no current mechanism injects it
-- `context-creator`: `npx` is a `.cmd` file on Windows — not directly executable when Claude Code spawns child processes without a shell
-
-Research confirmed (2026-05-05):
-- `settings.local.json` `env` key propagates to MCP child processes via OS inheritance (empirically confirmed)
-- Most robust Windows token injection: `[System.Environment]::SetEnvironmentVariable`
-- `npx` fix is documentation-only — no `.mcp.json` change needed
-- Pre-existing bug: `inject_claude_md.sh` runs `source .env` with `set -euo pipefail` — fails hard if `.env` absent in a fresh clone
-
-All changes are in the Melange template repo only. Initialized projects receive the fix via the TEMPLATE.md upgrade path. `.mcp.json` and `.gitignore` are not currently listed in TEMPLATE.md — adding them to universal files is what enables the upgrade path.
-
-**Relevant ADRs:** None existing for MCP config. Two new framework-layer ADRs required.
+Approved modification: pipeline is XML → JSON IR → Protocol[DTOBuilder] → type[T],
+not XML → JSON IR → Pydantic specifically. `from_schema()` accepts a pluggable
+`DTOBuilder` Protocol. Default builder uses Pydantic. parse() already uses `Validatable`
+Protocol — the consumption side is symmetrically backend-neutral.
 
 ---
 
-## Protected Files Check
+## Pre-flight: Phase 00 close-out
 
-No files in this plan appear in the Protected Files table. Melange's CLAUDE.md protected files section contains only `{{PLACEHOLDER}}` values (project uninitialized). No real guarded paths exist.
+### Step 0a — Roadmap correction
+File: `docs/planning/PROJECT_ROADMAP.md`
+- Phase 01: replace "r: namespace parser" → "plain-attribute annotation compiler (ADR-0001)"
+- Move `parse()` from Phase 02 into Phase 01
+- Phase 02 becomes: Prompt Utilities only (`to_template`, `format_error`, `RetryContext`)
+- Update Current Focus: Phase 01
+- Update Recently Completed: Phase 00 — Foundation
 
-**Protected files requiring approval: none.**
+### Step 0b — MEMORY.md update
+File: `.claude/memory/MEMORY.md`
+- Mark ADR-0001 as Accepted with canonical attribute vocabulary
+- Update Directory Layout Notes: add `_serializers.py` entry; note `DTOBuilder` in `__init__.py`
+- Remove "ADR-0001 pending" language from Confirmed Standards
+- Add `DTOBuilder` Protocol to confirmed public API surface
+
+### Step 0c — Remove unused dep
+File: `pyproject.toml`
+- Remove `deepdiff>=8.0` from `[project.optional-dependencies.dev]`
+
+### Step 0d — Commit
+Commit all staged changes + 0a–0c fixes.
 
 ---
 
-## Branch Prerequisite
+## Phase 01: Core Pipeline
 
-```bash
-git checkout main
-git pull origin main
-git checkout -b melange/mcp-server-fix
+### Step 1a — Annotation compiler
+File: `src/weirding/_schema.py` (Tier 2 protected)
+
+Implement `compile_schema(xml: str | bytes) -> dict`.
+
+Logic:
+1. Parse with `make_parser()` from `_parser.py`
+2. Detect XSD root (`{http://www.w3.org/2001/XMLSchema}schema`) → `UnsupportedDialectError`
+3. Walk element tree recursively:
+   - Root → `{"type": "object", "title": <root_tag>, "properties": {...}, "required": [...]}`
+   - Leaf → scalar from `type` attribute (default `"string"`)
+   - Element with children, no explicit type → `type="object"`, recurse
+   - `type="array"` → `{"type": "array", "items": <child schema>, "x-weirding-item-tag": <child_tag>}`
+4. Attribute dispatch: `type`, `required` (default `"true"`), `description`, `enum` (pipe-split),
+   `pattern`, `minimum`, `maximum`, `min`→`minLength/minItems`, `max`→`maxLength/maxItems`, `default`
+5. `nullable="true"` → `{"anyOf": [{"type": T}, {"type": "null"}]}` (draft 2020-12)
+6. Never emit `prefixItems`
+
+Tests: `tests/test_schema.py`
+- Scalar, object inference, array with `x-weirding-item-tag`, optional, enum (pipe-split),
+  nullable (exact `anyOf` shape asserted), pattern/min/max, XSD → `UnsupportedDialectError`,
+  malformed → `ParseError`
+
+Completion signal: `pytest tests/test_schema.py -v` pass, lint clean
+Estimate: M (1–2 days)
+
+---
+
+### Step 1a.5 — ADR-0005: x-weirding-item-tag
+Author before Step 1c begins. Decision: keep `x-weirding-item-tag` in the IR as a
+JSON Schema `x-*` extension key (compliant; standard consumers tolerate unknown keys).
+Rejected: runtime singularization (breaks irregular plurals), strip-and-store-in-model
+(splits self-contained IR).
+
+---
+
+### Step 1b — DTO builder abstraction + Pydantic builder
+Files: `src/weirding/_models.py` (Tier 2), `src/weirding/__init__.py` (Tier 1, flagged)
+
+**`DTOBuilder` Protocol** (defined in `__init__.py`, exported):
+```python
+@runtime_checkable
+class DTOBuilder(Protocol):
+    def build(self, schema: dict, *, name: str) -> type: ...
 ```
 
-All changes go on `melange/mcp-server-fix`.
+**`PydanticBuilder`** (defined in `_models.py`, exported):
+- Implements `DTOBuilder.build()` using `json-schema-to-pydantic`
+- Applies Patch 1: if `schema.get("additionalProperties") is False` → set
+  `extra="forbid"` post-construction. Implementing agent must verify exact Pydantic v2
+  post-construction API before writing code.
+  Candidate: `model.model_config = ConfigDict(extra="forbid"); model.model_rebuild(force=True)`
+  Evidence signal required: test must show actual `ValidationError` on extra field injection,
+  not config attribute inspection.
+
+**`build_model()` function** (internal, used by `PydanticBuilder`): unchanged shape.
+
+`PydanticBuilder` is the default; exported from `weirding.__init__` so callers can import
+it explicitly or subclass it.
+
+Tests: `tests/test_models.py`
+- `PydanticBuilder` produces a `BaseModel` subclass
+- `additionalProperties: false` → actual `ValidationError` on extra field
+- `$defs`/`$ref` round-trip
+- A custom `DTOBuilder` implementation satisfies `isinstance(builder, DTOBuilder)` at runtime
+
+Completion signal: `pytest tests/test_models.py -v` pass
+Estimate: S–M (half to full day)
 
 ---
 
-## Phase 1 — Safety Gate
+### Step 1c — Serializer + XML-to-dict
+File: `src/weirding/_serializers.py` (new file)
 
-**Ordering constraint:** Must complete before Phase 2. Phase 2 documentation tells users to put tokens in `settings.local.json`. That file must be gitignored before any docs reference it — otherwise `git add -A` in an initialized project could commit a secret.
+Implements `to_xml()` and `_xml_to_dict()`. ADR-0005 must be Accepted before this step.
 
-### Files modified
+`to_xml(instance: BaseModel) -> str`:
+- Root element = model class `__name__`
+- Scalar → `<field>value</field>`; nested model → recurse; list → repeated children
+  using `x-weirding-item-tag` from model JSON schema metadata
 
-- `.gitignore` — add `.claude/settings.local.json`
-- `.claude/hooks/inject_claude_md.sh` — fix `source .env`; add `GITHUB_TOKEN` warning
+`_xml_to_dict(element: lxml.etree._Element, model_type: type) -> dict`:
+- Schema-aware list coalescing: use Pydantic field type annotations (or `DTOBuilder`-supplied
+  metadata) to determine which fields expect lists — not naive same-tag coalescing
+- `parse()` in `__init__.py` imports and calls this as `_serializers._xml_to_dict(el, model)`
 
-### Change detail
+Tests: `tests/test_serializers.py`
+- Round-trip: `parse(to_xml(instance), type(instance)) == instance` for flat, nested,
+  array, optional-null
 
-**.gitignore:** Add one line:
-```
-.claude/settings.local.json
-```
-
-**inject_claude_md.sh:** Two changes:
-
-1. Replace hard `source .env` with graceful version:
-   ```bash
-   # Before:
-   source .env
-   # After:
-   [ -f .env ] && source .env || true
-   ```
-
-2. Add GITHUB_TOKEN warning block (after injecting CLAUDE.md content, before final exit):
-   ```bash
-   if [ -f "$proj/.mcp.json" ] && grep -q 'GITHUB_TOKEN' "$proj/.mcp.json" 2>/dev/null; then
-     if [ -z "${GITHUB_TOKEN:-}" ]; then
-       printf "\nWARNING: GITHUB_TOKEN is not set. The 'github' MCP server will fail.\n"
-       printf "Set it in .claude/settings.local.json under the 'env' key, or run:\n"
-       printf "  [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN','ghp_...','User')\n"
-       printf "Then restart Claude Code. See CLAUDE.md > MCP Servers for full instructions.\n\n"
-     fi
-   fi
-   ```
-   The warning checks env var presence only — never logs the token value.
-
-### Protected files
-None.
-
-### Completion signal
-1. `git check-ignore .claude/settings.local.json` exits 0
-2. Running `inject_claude_md.sh` with no `.env` file present produces no error
-3. Running it with `GITHUB_TOKEN` unset produces the warning message
-4. Running it with `GITHUB_TOKEN` set produces no warning
-
-### Estimate
-45 minutes
+Completion signal: `pytest tests/test_serializers.py -v` pass
+Estimate: M (1 day)
 
 ---
 
-## Phase 2 — Documentation + Framework Manifest
+### Step 1d — API wiring + integration
+File: `src/weirding/__init__.py` (Tier 1 protected — flagged for approval)
 
-### Files modified
+**Updated signatures:**
+```python
+def from_schema(
+    schema: dict,
+    *,
+    name: str = "Model",
+    builder: DTOBuilder | None = None,
+) -> type:
+    """
+    Default: PydanticBuilder() → type[BaseModel].
+    Pass any DTOBuilder for TypedDict, dataclass, Spark StructType, etc.
+    """
+    ...
 
-- `CLAUDE.md` — update MCP Servers section
-- `SETUP.md` — add Windows prerequisites section and token setup instructions
-- `TEMPLATE.md` — add `.mcp.json` and `.gitignore` to universal files list
-- `TEMPLATE_VERSION` — bump from `0.1.0` to `0.2.0`
-
-### Change detail
-
-**CLAUDE.md MCP Servers section:** Replace the last sentence:
+def define_model(
+    xml: str | bytes,
+    *,
+    builder: DTOBuilder | None = None,
+) -> type:
+    ...
 ```
-The `github` MCP requires `export GITHUB_TOKEN=<your-token>` in your shell.
+
+With overloads for static type safety of the Pydantic default path:
+```python
+@overload
+def from_schema(schema: dict, *, name: str = ...) -> type[BaseModel]: ...
+@overload
+def from_schema(schema: dict, *, name: str = ..., builder: DTOBuilder) -> type: ...
 ```
-With a structured token setup block covering:
-- Windows (recommended): `[System.Environment]::SetEnvironmentVariable("GITHUB_TOKEN", "ghp_...", "User")` — persists at user-environment level, inherited by all processes including VS Code, Windows Terminal, Claude Code desktop
-- All platforms (file-based): `settings.local.json` under `"env"` key (file is gitignored)
-- `context-creator` Windows prerequisite: Node.js must be installed via official installer so `npx` is in system-level PATH; verify with `where npx` in a plain terminal
 
-**SETUP.md:** Add a "### Windows: MCP server prerequisites" subsection under "### 8. Verify hooks" covering:
-- GitHub token: `SetEnvironmentVariable` command with explanation of why shell `export` is insufficient
-- Node.js PATH: require official installer; validate with `where npx`; explain why nvm-windows/fnm PATH injection doesn't propagate to subprocess spawners
-- Verification step for each
+Wire:
+- `compile(xml)` → `compile_schema(xml)`
+- `from_schema(schema, name, builder)` → `(builder or PydanticBuilder()).build(schema, name=name)`
+- `define_model(xml, builder)` → `from_schema(compile(xml), name=schema["title"] sanitized, builder=builder)`
+- `parse(xml, model)` → `_serializers._xml_to_dict(lxml.etree.fromstring(xml, make_parser()), model)`
+  then `model.model_validate(dict)`
+- `to_xml(instance)` → `_serializers.to_xml(instance)`
 
-**TEMPLATE.md:** In the universal files code block, add after `TEMPLATE_VERSION`:
-```
-.gitignore
-.mcp.json
-```
-Both files have no project-specific content — safe to overwrite during upgrades.
+**`__all__` additions:** `DTOBuilder`, `PydanticBuilder`
 
-**TEMPLATE_VERSION:** Bump `0.1.0` → `0.2.0` (minor — new capability for existing users: upgrade path now covers `.gitignore` and `.mcp.json`).
+Tests: `tests/test_integration.py`
+- Full round-trip with default (Pydantic) builder
+- `from_schema(..., builder=CustomDTOBuilder())` — custom builder is invoked
+- `define_model()` equivalent to two-step path
+- `Validatable` Protocol: custom class with `model_validate` satisfies `parse()`
+- Error paths: `ParseError`, `SchemaError`, `UnsupportedDialectError`
 
-### Protected files
-None.
-
-### Completion signal
-1. CLAUDE.md MCP section no longer mentions `export GITHUB_TOKEN`; contains both Windows and cross-platform instructions
-2. SETUP.md has the Windows prerequisites subsection with validation commands
-3. TEMPLATE.md universal files list contains `.gitignore` and `.mcp.json`
-4. `TEMPLATE_VERSION` reads `0.2.0`
-
-### Estimate
-1.5 hours
+Completion signal: `uv run pytest` all pass, `uv run ruff check .` clean
+Estimate: S–M (half to full day)
 
 ---
 
-## Phase 3 — ADRs
+## Revised Roadmap
 
-Two framework-layer architectural decisions to document. Author after implementation since decisions are already made from research.
-
-### Files created
-- `docs/adr/melange/0005-mcp-secret-injection.md`
-- `docs/adr/melange/0006-npx-mcp-command-retained.md`
-
-### Files modified
-- `docs/adr/melange/README.md` — add both entries to index
-
-### ADR 0005 — MCP secret injection: settings.local.json + Windows user env
-
-The decision to use `settings.local.json` `env` key as the file-based injection mechanism, with Windows `SetEnvironmentVariable` as the primary recommendation for Windows users.
-
-Alternatives documented: shell profile `export` (lost across non-interactive launches), launcher script (per-project wrapper; cross-platform fragile), literal token in `.mcp.json` (git-tracked; rejected), `.mcp.json` gitignored (conflicts with universal-file status).
-
-Caveat recorded: `env` key → child process propagation is empirically confirmed (mid-2025) but not explicitly documented as a guaranteed API contract. Fallback: Windows registry via `SetEnvironmentVariable`.
-
-### ADR 0006 — Retain `npx` in `.mcp.json` (not switching to `node` + pre-install)
-
-The decision to keep `"command": "npx"` and fix the Windows PATH issue via documentation rather than changing the command.
-
-Alternatives documented: `node` with absolute pre-installed path (machine-specific; breaks template portability), full path to `npx.cmd` (machine-specific), global pre-install + bare name (fragile with nvm/fnm version switches), HTTP/SSE transport (operational complexity; inappropriate for local dev).
-
-Rationale: `npx` is correct on macOS/Linux and correct on Windows with official Node.js installer. A documentation prerequisite is less disruptive than a command change that breaks cross-platform parity.
-
-### Protected files
-None.
-
-### Completion signal
-1. Both ADR files exist and are complete (decision, alternatives, rationale, date, status: Accepted)
-2. `docs/adr/melange/README.md` index shows ADR 0005 and ADR 0006
-
-### Estimate
-1 hour
+| Phase | Description |
+|-------|-------------|
+| ✅ 00 | Foundation — project setup, CI, core types |
+| 📋 01 | Core Pipeline — annotation compiler, JSON Schema IR, `DTOBuilder` Protocol, `PydanticBuilder`, `compile()` + `from_schema()` + `define_model()` + `parse()` + `to_xml()` |
+| 📋 02 | Prompt Utilities — `prompt.to_template()`, `prompt.format_error()`, `RetryContext` |
+| 📋 03 | XSD Support — `weirding[xsd]` extra, `xmlschema`-based IR bridge, dialect auto-detection |
+| 📋 04 | Distribution — pyproject.toml finalization, CI/CD pipeline, PyPI release, documentation |
 
 ---
 
-## ADR Candidates
+## ADRs to update before Step 1b begins
 
-- **MCP secret injection** (ADR 0005): Four credible alternatives with real trade-offs; empirically-confirmed behavior not in writing warrants recording the caveat and fallback
-- **Retain `npx` command** (ADR 0006): Decision to fix via docs rather than code; cross-platform implications; would be expensive to revisit once documentation is distributed
-
----
-
-## Simplicity Check
-
-**Could this be one phase?** No. The gitignore entry must land before docs reference `settings.local.json`. If a developer reads the updated CLAUDE.md and adds a token before their project's `.gitignore` is updated (via the upgrade path), they could commit a secret. The phase boundary enforces the ordering constraint.
-
-**Could Phase 2 and 3 merge?** Yes — documentation and ADRs could be one phase. Split here because ADRs are governance artifacts reviewed differently from user-facing docs. The split also allows shipping Phase 2 (docs) sooner if ADR authoring takes longer.
-
-**Is three phases the minimum?** Yes: safety (Phase 1) → user-facing changes (Phase 2) → governance (Phase 3).
-
----
-
-AWAITING HUMAN APPROVAL BEFORE PROCEEDING.
-State: PROCEED, MODIFY [description], or REJECT.
+- **ADR-0002 amendment**: `from_schema()` return type is `type` (not `type[BaseModel]`) when
+  a custom `DTOBuilder` is provided. Default overload still returns `type[BaseModel]`.
+  The JSON Schema IR contract is unchanged.
+- **ADR-0004 amendment**: `PydanticBuilder` is the named default implementation of `DTOBuilder`.
+  `build_model()` is its internal engine. The builder abstraction does not change the
+  `json-schema-to-pydantic` engine choice or the two patches.

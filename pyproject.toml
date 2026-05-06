@@ -20,7 +20,6 @@ dev = [
     "pytest>=8.0",
     "pytest-cov",
     "ruff>=0.4",
-    "deepdiff>=8.0",
 ]
 
 [tool.hatch.build.targets.wheel]
