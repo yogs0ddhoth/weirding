@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "context-creator": {
+      "command": "npx",
+      "args": ["-y", "context-creator-mcp@latest"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "."]
+    }
+  }
+}
