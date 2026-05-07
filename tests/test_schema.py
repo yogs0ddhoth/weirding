@@ -204,14 +204,7 @@ def test_empty_bytes_raises_parse_error() -> None:
 
 
 def test_nested_object() -> None:
-    xml = (
-        "<Order>"
-        "<customer>"
-        "<name />"
-        '<age type="integer" />'
-        "</customer>"
-        "</Order>"
-    )
+    xml = '<Order><customer><name /><age type="integer" /></customer></Order>'
     ir = compile_schema(xml)
     assert ir["title"] == "Order"
     customer = ir["properties"]["customer"]

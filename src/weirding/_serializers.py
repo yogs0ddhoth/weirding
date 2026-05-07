@@ -4,6 +4,7 @@ from typing import Any, get_args, get_origin
 
 from lxml import etree
 from pydantic import BaseModel
+from pydantic.fields import FieldInfo
 
 # ---------------------------------------------------------------------------
 # Scalar rendering
@@ -26,7 +27,7 @@ def _render_scalar(value: Any) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _item_tag_for_field(model: BaseModel, field_name: str) -> str:
+def _item_tag_for_field(field_name: str, field_info: FieldInfo) -> str:
     """Return the XML child tag for list items of *field_name*.
 
     Priority:
@@ -34,8 +35,7 @@ def _item_tag_for_field(model: BaseModel, field_name: str) -> str:
     2. Field name with a trailing ``s`` stripped (e.g. ``tags`` → ``tag``).
     3. Literal ``"item"`` when the field name has no trailing ``s``.
     """
-    field_info = type(model).model_fields.get(field_name)
-    if field_info is not None and isinstance(field_info.json_schema_extra, dict):
+    if isinstance(field_info.json_schema_extra, dict):
         tag = field_info.json_schema_extra.get("x-weirding-item-tag")
         if tag:
             return tag
@@ -51,9 +51,7 @@ def _item_tag_for_field(model: BaseModel, field_name: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _append_field(
-    parent: etree._Element, tag: str, value: Any, item_tag: str
-) -> None:
+def _append_field(parent: etree._Element, tag: str, value: Any, item_tag: str) -> None:
     """Append a child element <tag> to *parent* and populate it from *value*.
 
     Dispatch:
@@ -92,7 +90,8 @@ def _populate_element(elem: etree._Element, instance: BaseModel) -> None:
     model_cls = type(instance)
     for field_name in model_cls.model_fields:
         value = getattr(instance, field_name, None)
-        item_tag = _item_tag_for_field(instance, field_name)
+        field_info_obj = model_cls.model_fields[field_name]
+        item_tag = _item_tag_for_field(field_name, field_info_obj)
         _append_field(elem, field_name, value, item_tag)
 
 

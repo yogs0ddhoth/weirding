@@ -148,20 +148,9 @@ def test_round_trip_flat_model() -> None:
 
 
 def test_round_trip_nested_model() -> None:
-    schema_xml = (
-        "<order>"
-        "<customer>"
-        "<name/>"
-        '<age type="integer"/>'
-        "</customer>"
-        "</order>"
-    )
+    schema_xml = '<order><customer><name/><age type="integer"/></customer></order>'
     model = define_model(schema_xml)
-    data_xml = (
-        "<order>"
-        "<customer><name>Bob</name><age>42</age></customer>"
-        "</order>"
-    )
+    data_xml = "<order><customer><name>Bob</name><age>42</age></customer></order>"
 
     first = parse(data_xml, model)
     xml_out = to_xml(first)
@@ -174,9 +163,7 @@ def test_round_trip_array_field() -> None:
     schema_xml = "<results><items type='array'><item type='string'/></items></results>"
     model = define_model(schema_xml)
     data_xml = (
-        "<results>"
-        "<items><item>a</item><item>b</item><item>c</item></items>"
-        "</results>"
+        "<results><items><item>a</item><item>b</item><item>c</item></items></results>"
     )
 
     first = parse(data_xml, model)
@@ -246,16 +233,8 @@ def test_compile_empty_bytes_raises_parse_error() -> None:
 
 
 def test_array_round_trip() -> None:
-    schema_xml = (
-        "<results>"
-        "<items type='array'><item type='string'/></items>"
-        "</results>"
-    )
-    data_xml = (
-        "<results>"
-        "<items><item>a</item><item>b</item></items>"
-        "</results>"
-    )
+    schema_xml = "<results><items type='array'><item type='string'/></items></results>"
+    data_xml = "<results><items><item>a</item><item>b</item></items></results>"
     model = define_model(schema_xml)
 
     first = parse(data_xml, model)
