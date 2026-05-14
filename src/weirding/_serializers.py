@@ -17,9 +17,11 @@ def _render_scalar(value: Any) -> str:
     bool → "true" / "false" (not Python's True/False).
     Everything else → str(value).
     """
+
     if isinstance(value, bool):
         return "true" if value else "false"
-    return str(value)
+    else:
+        return str(value)
 
 
 # ---------------------------------------------------------------------------
@@ -38,12 +40,13 @@ def _item_tag_for_field(field_name: str, field_info: FieldInfo) -> str:
     if isinstance(field_info.json_schema_extra, dict):
         tag = field_info.json_schema_extra.get("x-weirding-item-tag")
         if tag:
-            return tag
+            return tag  # TODO: fix these type errors
 
     # Fallback: strip trailing "s", or use "item"
     if field_name.endswith("s") and len(field_name) > 1:
         return field_name[:-1]
-    return "item"
+    else:
+        return "item"
 
 
 # ---------------------------------------------------------------------------
@@ -61,23 +64,26 @@ def _append_field(parent: etree._Element, tag: str, value: Any, item_tag: str) -
     - scalar     → text content
     """
     elem = etree.SubElement(parent, tag)
+    match value:
+        case None:
+            return  # self-closing
 
-    if value is None:
-        return  # self-closing
-
-    if isinstance(value, BaseModel):
-        _populate_element(elem, value)
-    elif isinstance(value, list):
-        for item in value:
-            child = etree.SubElement(elem, item_tag)
-            if item is None:
-                pass  # self-closing
-            elif isinstance(item, BaseModel):
-                _populate_element(child, item)
-            else:
-                child.text = _render_scalar(item)
-    else:
-        elem.text = _render_scalar(value)
+        case BaseModel():
+            _populate_element(elem, value)
+        case [*items]:
+            for item in (
+                items
+            ):  # TODO: could this be recursive? is it serving a good design purpose?
+                child = etree.SubElement(elem, item_tag)
+                match item:
+                    case None:
+                        pass  # self-closing
+                    case BaseModel():
+                        _populate_element(child, item)
+                    case _:
+                        child.text = _render_scalar(item)
+        case _:
+            elem.text = _render_scalar(value)
 
 
 def _populate_element(elem: etree._Element, instance: BaseModel) -> None:
@@ -139,57 +145,59 @@ def _xml_to_dict(element: etree._Element, model_type: type) -> dict[str, Any]:
         if isinstance(tag, str):  # skip processing instructions / comments
             children_by_tag.setdefault(tag, []).append(child)
 
+    # TODO: model_fields is typed Unknown. this should be corrected and made an antipattern going forward
     for field_name, field_info in model_type.model_fields.items():
         annotation = field_info.annotation
         child_elements = children_by_tag.get(field_name, [])
 
-        if _is_list_field(annotation):
-            # List field — the field element wraps repeated child elements.
-            if child_elements:
-                wrapper = child_elements[0]
-                item_type_args = get_args(annotation)
-                item_type = item_type_args[0] if item_type_args else None
-                items: list[Any] = []
-                for item_elem in wrapper:
-                    if not isinstance(item_elem.tag, str):
-                        continue
-                    if (
-                        item_type is not None
-                        and isinstance(item_type, type)
-                        and issubclass(item_type, BaseModel)
-                    ):
-                        items.append(_xml_to_dict(item_elem, item_type))
-                    else:
-                        items.append(item_elem.text or "")
-                result[field_name] = items
-            else:
-                result[field_name] = []
-
-        elif (
-            annotation is not None
-            and isinstance(annotation, type)
-            and issubclass(annotation, BaseModel)
-        ):
-            # Nested object field — recurse with the nested model type.
-            if child_elements:
-                result[field_name] = _xml_to_dict(child_elements[0], annotation)
-            # Absent optional nested field: omit the key so Pydantic's default triggers.
-
-        else:
-            # Scalar field
-            if child_elements:
-                elem = child_elements[0]
-                text = elem.text
-                if text is None:
-                    # Empty element — required or not?
-                    required = field_info.is_required()
-                    result[field_name] = "" if required else None
+        match annotation:
+            case annotaion if _is_list_field(annotation):
+                # List field — the field element wraps repeated child elements.
+                if child_elements:
+                    wrapper = child_elements[0]
+                    item_type_args = get_args(annotation)
+                    item_type = item_type_args[0] if item_type_args else None
+                    items: list[Any] = []
+                    for item_elem in wrapper:
+                        if not isinstance(item_elem.tag, str):
+                            continue
+                        if (
+                            item_type is not None
+                            and isinstance(item_type, type)
+                            and issubclass(item_type, BaseModel)
+                        ):
+                            items.append(_xml_to_dict(item_elem, item_type))
+                        else:
+                            items.append(item_elem.text or "")
+                    result[field_name] = items
                 else:
-                    result[field_name] = text
-            elif field_info.is_required():
-                # Required field absent from XML: pass None so Pydantic
-                # raises a clear validation error.
-                result[field_name] = None
-            # Optional absent field: omit key so Pydantic's default triggers.
+                    result[field_name] = []
+
+            case annotation if (
+                annotaion is not None
+                and isinstance(annotation, type)
+                and issubclass(annotation, BaseModel)
+            ):
+                # Nested object field — recurse with the nested model type.
+                if child_elements:
+                    result[field_name] = _xml_to_dict(child_elements[0], annotation)
+                # Absent optional nested field: omit the key so Pydantic's default triggers.
+
+            case _:
+                # Scalar field
+                if child_elements:
+                    elem = child_elements[0]
+                    text = elem.text
+                    if text is None:
+                        # Empty element — required or not?
+                        required = field_info.is_required()
+                        result[field_name] = "" if required else None
+                    else:
+                        result[field_name] = text
+                elif field_info.is_required():
+                    # Required field absent from XML: pass None so Pydantic
+                    # raises a clear validation error.
+                    result[field_name] = None
+                # Optional absent field: omit key so Pydantic's default triggers.
 
     return result

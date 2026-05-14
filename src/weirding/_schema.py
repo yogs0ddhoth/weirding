@@ -20,6 +20,7 @@ _STRUCTURAL_ATTRS = frozenset({"type", "required", "nullable"})
 # ---------------------------------------------------------------------------
 
 
+# TODO: define a clear dispatch table les ad hoc than encoding it in the function logic
 def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
     """Apply element attributes to *schema* in-place, following the dispatch table.
 
@@ -32,6 +33,7 @@ def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
         schema["description"] = attrib["description"]
 
     if "enum" in attrib:
+        # TODO: fix this
         schema["enum"] = [v for v in attrib["enum"].split("|")]
 
     if "pattern" in attrib:
