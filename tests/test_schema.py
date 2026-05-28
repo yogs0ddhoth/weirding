@@ -2,7 +2,7 @@
 
 import pytest
 
-from weirding._exceptions import ParseError, UnsupportedDialectError
+from weirding._exceptions import ParseError
 from weirding._schema import compile_schema
 
 # ---------------------------------------------------------------------------
@@ -181,17 +181,25 @@ def test_minimum_float() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 11. XSD root element → UnsupportedDialectError
+# 11. XSD root element with no declarations → SchemaError
 # ---------------------------------------------------------------------------
 
 
-def test_xsd_root_raises_unsupported_dialect() -> None:
+def test_xsd_root_empty_raises_schema_error() -> None:
+    """An XSD with no top-level element declarations raises SchemaError.
+
+    This test was previously named test_xsd_root_raises_unsupported_dialect and
+    expected UnsupportedDialectError.  Now that weirding[xsd] is installed, the
+    XSD path is active and an empty schema raises SchemaError instead.
+    """
+    from weirding._exceptions import SchemaError
+
     xsd_xml = (
         '<?xml version="1.0"?>'
         '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">'
         "</xs:schema>"
     )
-    with pytest.raises(UnsupportedDialectError, match="weirding\\[xsd\\]"):
+    with pytest.raises(SchemaError):
         compile_schema(xsd_xml)
 
 

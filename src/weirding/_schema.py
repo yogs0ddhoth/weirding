@@ -172,7 +172,11 @@ def compile_schema(xml: str | bytes) -> dict:
         raise ParseError(str(exc)) from exc
 
     if root.tag == _XSD_SCHEMA_TAG:
-        raise UnsupportedDialectError("XSD support requires weirding[xsd]")
+        try:
+            from weirding.xsd._bridge import xsd_to_ir
+        except ImportError as exc:
+            raise UnsupportedDialectError("XSD support requires weirding[xsd]") from exc
+        return xsd_to_ir(root)
 
     root_tag = _local_tag(root)
     children = list(root)

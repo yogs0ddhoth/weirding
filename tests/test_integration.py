@@ -13,7 +13,6 @@ from pydantic import BaseModel
 from weirding import (
     DTOBuilder,
     ParseError,
-    UnsupportedDialectError,
     compile,
     define_model,
     from_schema,
@@ -208,13 +207,21 @@ def test_parse_malformed_xml_raises_parse_error() -> None:
         parse("<unclosed", model)
 
 
-def test_compile_xsd_raises_unsupported_dialect_error() -> None:
+def test_compile_xsd_empty_raises_schema_error() -> None:
+    """An XSD with no top-level element declarations raises SchemaError.
+
+    This test was previously named test_compile_xsd_raises_unsupported_dialect_error
+    and expected UnsupportedDialectError.  Now that weirding[xsd] is installed,
+    the XSD path is active and an empty schema raises SchemaError instead.
+    """
+    from weirding._exceptions import SchemaError
+
     xsd_xml = (
         '<?xml version="1.0"?>'
         '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">'
         "</xs:schema>"
     )
-    with pytest.raises(UnsupportedDialectError):
+    with pytest.raises(SchemaError):
         compile(xsd_xml)
 
 

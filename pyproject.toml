@@ -15,12 +15,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-xsd = []
+xsd = ["xmlschema>=3.0"]
 dev = [
     "pytest>=8.0",
     "pytest-cov",
     "ruff>=0.4",
     "lxml-stubs>=0.5",
+    "weirding[xsd]",
 ]
 
 [tool.hatch.build.targets.wheel]
