@@ -8,7 +8,7 @@ future agent would need to avoid re-litigating.
 ## Core Facts
 
 - **Language / Stack:** Python 3.11+, pydantic>=2.0, lxml>=4.9.2, json-schema-to-pydantic>=0.4, uv
-- **Current phase:** Phase 02 — Prompt Utilities (complete)
+- **Current phase:** Phase 03 — XSD Support (complete); next: Phase 04 — Distribution
 - **Framework version:** 0.3.0
 - **Roadmap:** `docs/planning/PROJECT_ROADMAP.md`
 - **ADRs:** `docs/adr/` — read before touching any component
@@ -58,6 +58,7 @@ agents. Never run verbose or iterative commands in the main session.
 - **`Validatable` Protocol**: `def model_validate(cls, data: dict[str, Any]) -> Any` classmethod. Satisfied by every Pydantic `BaseModel` subclass. Allows `parse()` to work with future non-Pydantic validators without changing the public signature.
 - **Model name derivation**: root XML element tag, sanitized to a valid Python identifier (`re.sub(r'[^A-Za-z0-9_]', '_', tag).lstrip('0123456789') or 'Model'`). Passed as `name` to `from_schema()`.
 - **`json-schema-to-pydantic>=0.4` confirmed** as the engine for `build_model()` / `from_schema()`. Two weirding-owned patches required: (1) post-creation `extra="forbid"` when schema has `"additionalProperties": false`; (2) IR compiler never emits `prefixItems` (rule 11).
-- Base dependencies: `pydantic>=2.0`, `lxml>=4.9.2`, `json-schema-to-pydantic>=0.4`
+- Base dependencies: `pydantic>=2.0`, `lxml>=4.9.2`, `json-schema-to-pydantic>=0.4`; XSD optional dep: `xmlschema>=3.0` (in `[xsd]` extra only)
+- **XSD bridge (`src/weirding/xsd/_bridge.py`)**: `xmlschema.XMLSchema(root_element, defuse="always")` — pass the already-parsed lxml element, always `defuse="always"` (NOT remote or default). Type map keys are Clark-notation URIs (`{http://www.w3.org/2001/XMLSchema}string`), NOT `xs:`-prefixed names. `_iter_elements()` guards against `xs:simpleContent` via `isinstance(content, XsdGroup)` — without this guard, simpleContent raises TypeError. XSD bridge never emits `"additionalProperties": false`; `extra="forbid"` patch does not fire for XSD-derived models (intentional). ADR-0006 documents library choice and security posture (pending authoring).
 - **Future capability targets** (inform all design decisions): enterprise document ingestion (Word/Office Open XML, Excel XLSX), Anthropic structured output and XML capabilities, Kubernetes MCP server/gateway payloads, Databricks AI-aided data science and ETL pipelines. Attribute convention and IR design must remain idiomatic XML across all these contexts.
 - Prototype at `C:\Users\becom\Developer\Lithium\packages\xml-pydantic` — port `schema.py` (native-XML annotation compiler) and `serializers.py` (model→XML); replace `ET.fromstring()` with `make_parser()`; replace `datamodel-code-generator` with `json-schema-to-pydantic`. Note: prototype used `data-*`; do NOT carry that convention forward.
