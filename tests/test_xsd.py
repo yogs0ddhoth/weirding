@@ -116,6 +116,20 @@ EMPTY_XSD = """\
 </xs:schema>
 """
 
+CHOICE_XSD = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Shape">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="circle" type="xs:string"/>
+        <xs:element name="rectangle" type="xs:string"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+"""
+
 # ---------------------------------------------------------------------------
 # Phase 03a — flat scalar fields
 # ---------------------------------------------------------------------------
@@ -236,6 +250,38 @@ class TestEnumXSD:
         ir = compile(ENUM_XSD)
         # status is a string restriction — base type should map to string
         assert ir["properties"]["status"]["type"] == "string"
+
+
+# ---------------------------------------------------------------------------
+# Phase 03d — xs:choice → oneOf
+# ---------------------------------------------------------------------------
+
+
+class TestChoiceXSD:
+    def test_choice_produces_one_of(self):
+        ir = compile(CHOICE_XSD)
+        assert "oneOf" in ir
+
+    def test_choice_branch_count(self):
+        ir = compile(CHOICE_XSD)
+        assert len(ir["oneOf"]) == 2
+
+    def test_first_branch_circle(self):
+        ir = compile(CHOICE_XSD)
+        branch = ir["oneOf"][0]
+        assert "circle" in branch["properties"]
+        assert branch["required"] == ["circle"]
+
+    def test_second_branch_rectangle(self):
+        ir = compile(CHOICE_XSD)
+        branch = ir["oneOf"][1]
+        assert "rectangle" in branch["properties"]
+        assert branch["required"] == ["rectangle"]
+
+    def test_branch_property_type(self):
+        ir = compile(CHOICE_XSD)
+        assert ir["oneOf"][0]["properties"]["circle"] == {"type": "string"}
+        assert ir["oneOf"][1]["properties"]["rectangle"] == {"type": "string"}
 
 
 # ---------------------------------------------------------------------------

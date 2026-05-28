@@ -126,8 +126,32 @@ def _type_to_schema(xsd_type) -> dict:
     return _type_to_ir(xsd_type)
 
 
+def _choice_to_ir(choice_group) -> dict:
+    """Convert an xs:choice group to a JSON Schema oneOf."""
+    branches = []
+    for elem_decl in choice_group:
+        field_name = elem_decl.local_name
+        field_ir = _elem_decl_to_ir(elem_decl)
+        branch = {
+            "type": "object",
+            "properties": {field_name: field_ir},
+            "required": [field_name],
+        }
+        branches.append(branch)
+    return {"oneOf": branches}
+
+
 def _complex_type_to_ir(complex_type) -> dict:
     """Convert an XsdComplexType to a JSON Schema object fragment."""
+    from xmlschema.validators import XsdGroup
+
+    content = getattr(complex_type, "content", None)
+    if not isinstance(content, XsdGroup):
+        return _type_to_ir(complex_type)
+
+    if content.model == "choice":
+        return _choice_to_ir(content)
+
     properties: dict = {}
     required: list[str] = []
 
