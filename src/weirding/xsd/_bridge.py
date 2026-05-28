@@ -4,6 +4,9 @@ Converts an already-parsed lxml element tree rooted at xs:schema into the
 weirding JSON Schema IR dict.  Security invariant: ``defuse="always"`` is
 passed to every ``xmlschema.XMLSchema()`` call so that remote entity
 references are always rejected regardless of the caller.
+
+See ADR-0006 for library choice rationale, security posture, and type-map
+key format (Clark-notation URIs, never xs:-prefixed names).
 """
 
 from __future__ import annotations

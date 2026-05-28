@@ -21,3 +21,4 @@ ADRs are append-only.
 | 0003 | [Validatable Protocol for parse()](0003-validatable-protocol.md) | Accepted | 2026-05-06 | `parse()` accepts any `Validatable` Protocol, not just Pydantic `BaseModel`, enabling non-Pydantic backends |
 | 0004 | [json-schema-to-pydantic Engine](0004-json-schema-to-pydantic-engine.md) | Accepted | 2026-05-06 | Runtime model builder; two weirding patches: `additionalProperties`→`extra="forbid"`, `prefixItems` banned from IR |
 | 0005 | [x-weirding-item-tag Extension Key](0005-x-weirding-item-tag.md) | Accepted | 2026-05-06 | Array fields carry child tag name in IR as `x-*` extension key for round-trip serialization fidelity |
+| 0006 | [XSD Support — Library Choice, Security Posture, and Type Mapping](0006-xsd-support-library-and-security-posture.md) | Accepted | 2026-05-28 | `xmlschema>=3.0` as optional `[xsd]` dep; `defuse="always"` mandatory; Clark-notation URI keys for type map |
