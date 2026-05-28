@@ -1,3 +1,7 @@
+from json_schema_to_pydantic import create_model
+from json_schema_to_pydantic.exceptions import CombinerError, ReferenceError
+from json_schema_to_pydantic.exceptions import SchemaError as LibSchemaError
+from json_schema_to_pydantic.exceptions import TypeError as LibTypeError
 from pydantic import BaseModel, ConfigDict
 
 from weirding._exceptions import SchemaError
@@ -11,13 +15,6 @@ def build_model(schema: dict, *, name: str = "Model") -> type[BaseModel]:
       - schema["additionalProperties"] == False  →  model_config extra="forbid"
       - prefixItems must never appear in schema (enforced by _schema.py, not here)
     """
-    try:
-        from json_schema_to_pydantic import create_model
-        from json_schema_to_pydantic.exceptions import CombinerError, ReferenceError
-        from json_schema_to_pydantic.exceptions import SchemaError as LibSchemaError
-        from json_schema_to_pydantic.exceptions import TypeError as LibTypeError
-    except ImportError as exc:
-        raise SchemaError("json-schema-to-pydantic is not installed") from exc
 
     try:
         model = create_model(schema)

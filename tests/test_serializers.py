@@ -186,14 +186,7 @@ def test_roundtrip_flat() -> None:
 
 
 def test_roundtrip_nested() -> None:
-    xml_schema = (
-        "<Order>"
-        "<customer>"
-        "<name />"
-        '<age type="integer" />'
-        "</customer>"
-        "</Order>"
-    )
+    xml_schema = '<Order><customer><name /><age type="integer" /></customer></Order>'
     schema = compile_schema(xml_schema)
     Model = build_model(schema, name="Order")
 

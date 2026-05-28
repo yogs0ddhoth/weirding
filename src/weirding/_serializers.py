@@ -4,6 +4,7 @@ from typing import Any, get_args, get_origin
 
 from lxml import etree
 from pydantic import BaseModel
+from pydantic.fields import FieldInfo
 
 # ---------------------------------------------------------------------------
 # Scalar rendering
@@ -16,6 +17,7 @@ def _render_scalar(value: Any) -> str:
     bool → "true" / "false" (not Python's True/False).
     Everything else → str(value).
     """
+
     if isinstance(value, bool):
         return "true" if value else "false"
     return str(value)
@@ -26,7 +28,7 @@ def _render_scalar(value: Any) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _item_tag_for_field(model: BaseModel, field_name: str) -> str:
+def _item_tag_for_field(field_name: str, field_info: FieldInfo) -> str:
     """Return the XML child tag for list items of *field_name*.
 
     Priority:
@@ -34,10 +36,9 @@ def _item_tag_for_field(model: BaseModel, field_name: str) -> str:
     2. Field name with a trailing ``s`` stripped (e.g. ``tags`` → ``tag``).
     3. Literal ``"item"`` when the field name has no trailing ``s``.
     """
-    field_info = type(model).model_fields.get(field_name)
-    if field_info is not None and isinstance(field_info.json_schema_extra, dict):
+    if isinstance(field_info.json_schema_extra, dict):
         tag = field_info.json_schema_extra.get("x-weirding-item-tag")
-        if tag:
+        if isinstance(tag, str):
             return tag
 
     # Fallback: strip trailing "s", or use "item"
@@ -51,9 +52,7 @@ def _item_tag_for_field(model: BaseModel, field_name: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _append_field(
-    parent: etree._Element, tag: str, value: Any, item_tag: str
-) -> None:
+def _append_field(parent: etree._Element, tag: str, value: Any, item_tag: str) -> None:
     """Append a child element <tag> to *parent* and populate it from *value*.
 
     Dispatch:
@@ -63,23 +62,27 @@ def _append_field(
     - scalar     → text content
     """
     elem = etree.SubElement(parent, tag)
+    match value:
+        case None:
+            return  # self-closing
 
-    if value is None:
-        return  # self-closing
-
-    if isinstance(value, BaseModel):
-        _populate_element(elem, value)
-    elif isinstance(value, list):
-        for item in value:
-            child = etree.SubElement(elem, item_tag)
-            if item is None:
-                pass  # self-closing
-            elif isinstance(item, BaseModel):
-                _populate_element(child, item)
-            else:
-                child.text = _render_scalar(item)
-    else:
-        elem.text = _render_scalar(value)
+        case BaseModel():
+            _populate_element(elem, value)
+        case [*items]:
+            # Flat iteration only — list-of-lists is not a supported schema type
+            # (MEMORY.md rule 11 bans prefixItems and nested arrays), so each
+            # item is either a scalar or a nested BaseModel, never another list.
+            for item in items:
+                child = etree.SubElement(elem, item_tag)
+                match item:
+                    case None:
+                        pass  # self-closing
+                    case BaseModel():
+                        _populate_element(child, item)
+                    case _:
+                        child.text = _render_scalar(item)
+        case _:
+            elem.text = _render_scalar(value)
 
 
 def _populate_element(elem: etree._Element, instance: BaseModel) -> None:
@@ -92,7 +95,8 @@ def _populate_element(elem: etree._Element, instance: BaseModel) -> None:
     model_cls = type(instance)
     for field_name in model_cls.model_fields:
         value = getattr(instance, field_name, None)
-        item_tag = _item_tag_for_field(instance, field_name)
+        field_info_obj = model_cls.model_fields[field_name]
+        item_tag = _item_tag_for_field(field_name, field_info_obj)
         _append_field(elem, field_name, value, item_tag)
 
 
@@ -123,7 +127,9 @@ def _is_list_field(annotation: Any) -> bool:
     return get_origin(annotation) is list
 
 
-def _xml_to_dict(element: etree._Element, model_type: type) -> dict[str, Any]:
+def _xml_to_dict(
+    element: etree._Element, model_type: type[BaseModel]
+) -> dict[str, Any]:
     """Convert an lxml element tree into a dict for ``model_type.model_validate()``.
 
     Uses ``model_type.model_fields`` to drive the conversion — schema-aware, not

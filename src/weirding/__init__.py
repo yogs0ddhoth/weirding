@@ -113,9 +113,7 @@ def from_schema(schema: dict, *, name: str = ...) -> type[BaseModel]: ...
 
 
 @overload
-def from_schema(
-    schema: dict, *, name: str = ..., builder: DTOBuilder
-) -> type: ...
+def from_schema(schema: dict, *, name: str = ..., builder: DTOBuilder) -> type: ...
 
 
 def from_schema(
