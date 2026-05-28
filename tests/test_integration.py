@@ -20,6 +20,7 @@ from weirding import (
     parse,
     to_xml,
 )
+from weirding.prompt import RetryContext, to_template
 
 # ---------------------------------------------------------------------------
 # Shared schema XML used across multiple tests
@@ -243,3 +244,53 @@ def test_array_round_trip() -> None:
 
     assert second.items == first.items  # type: ignore[attr-defined]
     assert list(second.items) == ["a", "b"]  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# 10. Phase 02 retry-loop integration test
+# ---------------------------------------------------------------------------
+
+
+def test_prompt_utilities_retry_loop() -> None:
+    """End-to-end Phase 02 user story.
+
+    define_model() → to_template() → [mock bad LLM response] → parse() fails
+    → RetryContext.record_error() → retry_message() useful
+    → [mock good LLM response] → parse() succeeds
+    """
+    schema_xml = (
+        '<extraction><confidence type="number"/><label type="string"/></extraction>'
+    )
+    model = define_model(schema_xml)
+
+    # 1. to_template() produces a usable XML template
+    template = to_template(model)
+    assert "<confidence>" in template
+    assert "<label>" in template
+
+    # 2. Bad LLM response — missing required field ``confidence``
+    bad_xml = "<extraction><label>positive</label></extraction>"
+    with pytest.raises(ParseError):
+        parse(bad_xml, model)
+
+    # 3. RetryContext records the error correctly
+    ctx = RetryContext(model, max_attempts=3)
+    try:
+        parse(bad_xml, model)
+    except ParseError as exc:
+        ctx.record_error(exc)
+
+    assert ctx.attempt == 1
+    assert not ctx.exceeded
+
+    # 4. retry_message() contains actionable validation detail
+    msg = ctx.retry_message()
+    assert "confidence" in msg or "validation" in msg
+
+    # 5. Good LLM response — all required fields present
+    good_xml = (
+        "<extraction><confidence>0.95</confidence><label>positive</label></extraction>"
+    )
+    instance = parse(good_xml, model)
+    assert instance.label == "positive"  # type: ignore[attr-defined]
+    assert float(instance.confidence) == pytest.approx(0.95)  # type: ignore[attr-defined]

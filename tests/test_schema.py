@@ -106,6 +106,23 @@ def test_enum_pipe_split() -> None:
 
 
 # ---------------------------------------------------------------------------
+# 7b. Enum type coercion
+# ---------------------------------------------------------------------------
+
+
+def test_enum_string_values_stay_strings() -> None:
+    xml = schema_with_field('<status enum="a|b|c" />')
+    ir = compile_schema(xml)
+    assert ir["properties"]["status"]["enum"] == ["a", "b", "c"]
+
+
+def test_enum_integer_values_coerced() -> None:
+    xml = schema_with_field('<priority type="integer" enum="1|2|3" />')
+    ir = compile_schema(xml)
+    assert ir["properties"]["priority"]["enum"] == [1, 2, 3]
+
+
+# ---------------------------------------------------------------------------
 # 8. nullable="true" → anyOf shape
 # ---------------------------------------------------------------------------
 

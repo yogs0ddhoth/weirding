@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 from lxml import etree
@@ -14,13 +15,23 @@ _XSD_SCHEMA_TAG = f"{{{_XSD_NS}}}schema"
 # Attribute names that control structural dispatch rather than JSON Schema keywords
 _STRUCTURAL_ATTRS = frozenset({"type", "required", "nullable"})
 
+# Dispatch table: attribute name → (schema key, converter)
+# min/max are excluded because they depend on the sibling ``type`` attribute.
+# enum is excluded because its values must be coerced to match the declared type.
+_ATTR_DISPATCH: dict[str, tuple[str, Callable[[str], Any]]] = {
+    "description": ("description", str),
+    "pattern": ("pattern", str),
+    "minimum": ("minimum", float),
+    "maximum": ("maximum", float),
+    "default": ("default", str),
+}
+
 
 # ---------------------------------------------------------------------------
 # Attribute dispatch helpers
 # ---------------------------------------------------------------------------
 
 
-# TODO: define a clear dispatch table les ad hoc than encoding it in the function logic
 def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
     """Apply element attributes to *schema* in-place, following the dispatch table.
 
@@ -29,21 +40,9 @@ def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
     """
     attrib = element.attrib
 
-    if "description" in attrib:
-        schema["description"] = attrib["description"]
-
-    if "enum" in attrib:
-        # TODO: fix this
-        schema["enum"] = [v for v in attrib["enum"].split("|")]
-
-    if "pattern" in attrib:
-        schema["pattern"] = attrib["pattern"]
-
-    if "minimum" in attrib:
-        schema["minimum"] = float(attrib["minimum"])
-
-    if "maximum" in attrib:
-        schema["maximum"] = float(attrib["maximum"])
+    for attr_name, (schema_key, converter) in _ATTR_DISPATCH.items():
+        if attr_name in attrib:
+            schema[schema_key] = converter(attrib[attr_name])
 
     # ``min`` → minLength (string) or minItems (array)
     if "min" in attrib:
@@ -61,8 +60,16 @@ def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
         else:
             schema["maxLength"] = int(attrib["max"])
 
-    if "default" in attrib:
-        schema["default"] = attrib["default"]
+    # ``enum`` — values coerced to match the declared field type
+    if "enum" in attrib:
+        current_type = attrib.get("type", "string")
+        raw_values = attrib["enum"].split("|")
+        if current_type == "integer":
+            schema["enum"] = [int(v) for v in raw_values]
+        elif current_type == "number":
+            schema["enum"] = [float(v) for v in raw_values]
+        else:
+            schema["enum"] = raw_values
 
 
 def _wrap_nullable(schema: dict[str, Any]) -> dict[str, Any]:
