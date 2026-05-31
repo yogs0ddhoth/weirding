@@ -113,6 +113,10 @@ def from_schema(schema: dict, *, name: str = ...) -> type[BaseModel]: ...
 
 
 @overload
+def from_schema(schema: dict, *, name: str = ..., builder: None) -> type[BaseModel]: ...
+
+
+@overload
 def from_schema(schema: dict, *, name: str = ..., builder: DTOBuilder) -> type: ...
 
 
@@ -192,7 +196,7 @@ def parse(xml: str | bytes, model: type[Validatable]) -> Any:
     except etree.XMLSyntaxError as exc:
         raise ParseError(str(exc)) from exc
 
-    data = _xml_to_dict(root, model)  # type: ignore[arg-type]
+    data = _xml_to_dict(root, model)  # type: ignore
     try:
         return model.model_validate(data)
     except PydanticValidationError as exc:

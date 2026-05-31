@@ -29,7 +29,11 @@ def _comment_texts(parent: etree._Element) -> list[str]:
     isinstance(n, etree._Element) check includes comments.  We must use
     isinstance(n, etree._Comment) to distinguish them.
     """
-    return [node.text for node in parent if isinstance(node, etree._Comment)]
+    return [
+        node.text
+        for node in parent
+        if isinstance(node, etree._Comment) and node.text is not None
+    ]
 
 
 def _child_elements(parent: etree._Element) -> list[etree._Element]:
@@ -53,7 +57,7 @@ def test_scalar_str() -> None:
     out = to_template(M)
     root = _parse(out)
     assert root.find("name") is not None
-    assert root.find("name").text == "string"
+    assert root.find("name").text == "string"  # type: ignore[union-attr]
 
 
 def test_scalar_int() -> None:
@@ -62,7 +66,7 @@ def test_scalar_int() -> None:
 
     out = to_template(M)
     root = _parse(out)
-    assert root.find("count").text == "integer"
+    assert root.find("count").text == "integer"  # type: ignore[union-attr]
 
 
 def test_scalar_float() -> None:
@@ -71,7 +75,7 @@ def test_scalar_float() -> None:
 
     out = to_template(M)
     root = _parse(out)
-    assert root.find("score").text == "number"
+    assert root.find("score").text == "number"  # type: ignore[union-attr]
 
 
 def test_scalar_bool_uses_true_not_boolean() -> None:
@@ -82,7 +86,7 @@ def test_scalar_bool_uses_true_not_boolean() -> None:
 
     out = to_template(M)
     root = _parse(out)
-    assert root.find("active").text == "true"
+    assert root.find("active").text == "true"  # type: ignore[union-attr]
 
 
 # ---------------------------------------------------------------------------
@@ -103,7 +107,7 @@ def test_description_comment_appears_before_element() -> None:
     elem_nodes = _child_elements(root)
 
     assert len(comment_nodes) == 1
-    assert "The full name" in comment_nodes[0].text
+    assert "The full name" in comment_nodes[0].text  # type: ignore[operator]
     assert len(elem_nodes) == 1
     assert elem_nodes[0].tag == "name"
 
@@ -128,7 +132,7 @@ def test_optional_field_has_optional_comment() -> None:
     comments = _comment_texts(root)
     assert any("optional" in c for c in comments)
     assert root.find("bio") is not None
-    assert root.find("bio").text == "string"
+    assert root.find("bio").text == "string"  # type: ignore[union-attr]
 
 
 def test_optional_field_pipe_syntax() -> None:
@@ -142,7 +146,7 @@ def test_optional_field_pipe_syntax() -> None:
 
     comments = _comment_texts(root)
     assert any("optional" in c for c in comments)
-    assert root.find("notes").text == "string"
+    assert root.find("notes").text == "string"  # type: ignore[union-attr]
 
 
 # ---------------------------------------------------------------------------
@@ -165,12 +169,12 @@ def test_optional_with_description_order() -> None:
     desc_idx = next(
         i
         for i, n in enumerate(nodes)
-        if isinstance(n, etree._Comment) and "A short note" in n.text
+        if isinstance(n, etree._Comment) and "A short note" in n.text  # type: ignore[operator]
     )
     opt_idx = next(
         i
         for i, n in enumerate(nodes)
-        if isinstance(n, etree._Comment) and "optional" in n.text
+        if isinstance(n, etree._Comment) and "optional" in n.text  # type: ignore[operator]
     )
     assert desc_idx < opt_idx
 
@@ -198,7 +202,7 @@ def test_literal_field_allowed_values_comment() -> None:
 
     # Element should be rendered as a scalar placeholder
     assert root.find("status") is not None
-    assert root.find("status").text == "string"
+    assert root.find("status").text == "string"  # type: ignore[union-attr]
 
 
 def test_literal_field_optional() -> None:
@@ -234,9 +238,9 @@ def test_nested_object_recurses() -> None:
     assert addr_elem is not None
 
     assert addr_elem.find("street") is not None
-    assert addr_elem.find("street").text == "string"
+    assert addr_elem.find("street").text == "string"  # type: ignore[union-attr]
     assert addr_elem.find("city") is not None
-    assert addr_elem.find("city").text == "string"
+    assert addr_elem.find("city").text == "string"  # type: ignore[union-attr]
 
 
 # ---------------------------------------------------------------------------
@@ -260,7 +264,9 @@ def test_list_of_scalars_two_items_and_comment() -> None:
     assert all(c.text == "string" for c in children)
 
     # "repeat as needed" comment inside wrapper
-    wrapper_comments = [n.text for n in wrapper if isinstance(n, etree._Comment)]
+    wrapper_comments = [
+        n.text for n in wrapper if isinstance(n, etree._Comment) and n.text is not None
+    ]
     assert any("repeat as needed" in c for c in wrapper_comments)
 
 
@@ -274,6 +280,7 @@ def test_list_item_tag_strips_trailing_s() -> None:
     root = _parse(out)
 
     wrapper = root.find("tags")
+    assert wrapper is not None
     children = _child_elements(wrapper)
     assert all(c.tag == "tag" for c in children)
 
@@ -288,6 +295,7 @@ def test_list_item_tag_no_s_uses_item() -> None:
     root = _parse(out)
 
     wrapper = root.find("data")
+    assert wrapper is not None
     children = _child_elements(wrapper)
     assert all(c.tag == "item" for c in children)
     assert all(c.text == "integer" for c in children)
@@ -318,9 +326,9 @@ def test_list_of_objects_two_items_with_sub_structure() -> None:
     for child in children:
         assert child.tag == "item"
         assert child.find("product_id") is not None
-        assert child.find("product_id").text == "string"
+        assert child.find("product_id").text == "string"  # type: ignore[union-attr]
         assert child.find("quantity") is not None
-        assert child.find("quantity").text == "integer"
+        assert child.find("quantity").text == "integer"  # type: ignore[union-attr]
 
 
 # ---------------------------------------------------------------------------
@@ -341,7 +349,7 @@ def test_optional_list_has_optional_comment_before_wrapper() -> None:
         (
             i
             for i, n in enumerate(nodes)
-            if isinstance(n, etree._Comment) and "optional" in n.text
+            if isinstance(n, etree._Comment) and "optional" in n.text  # type: ignore[operator]
         ),
         None,
     )
@@ -431,10 +439,10 @@ def test_all_fields_present() -> None:
     out = to_template(M)
     root = _parse(out)
 
-    assert root.find("a").text == "string"
-    assert root.find("b").text == "integer"
-    assert root.find("c").text == "number"
-    assert root.find("d").text == "true"
+    assert root.find("a").text == "string"  # type: ignore[union-attr]
+    assert root.find("b").text == "integer"  # type: ignore[union-attr]
+    assert root.find("c").text == "number"  # type: ignore[union-attr]
+    assert root.find("d").text == "true"  # type: ignore[union-attr]
 
 
 # ---------------------------------------------------------------------------

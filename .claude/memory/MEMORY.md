@@ -27,6 +27,7 @@ future agent would need to avoid re-litigating.
 10. JSON Schema dict is the canonical IR and IS publicly exposed via `weirding.compile(xml) -> dict`. All dialect parsers produce it; all model generators consume it. Its structure follows JSON Schema draft 2020-12.
 11. `prefixItems` is banned from the JSON Schema IR weirding emits. The library `json-schema-to-pydantic` does not support it. Positional sequences must be represented as named-field objects instead.
 12. After `json-schema-to-pydantic` builds a model from a schema with `"additionalProperties": false`, weirding must set `model_config = ConfigDict(extra="forbid")` on that model — the library recognizes the keyword but does not enforce it.
+13. Zero pyright errors — `uv run pyright` must exit 0 before every commit. Config: `[tool.pyright]` in `pyproject.toml`, `typeCheckingMode = "standard"`, `reportMissingTypeStubs = "none"`. Note: pyright downloads its Node binary on first run — may fail in network-isolated CI; Phase 04 CI/CD configuration must address this.
 
 ## Agent Dispatch Mandate
 

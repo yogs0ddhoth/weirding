@@ -2,10 +2,10 @@
 
 import pytest
 
-xmlschema = pytest.importorskip("xmlschema")
+from weirding import compile, from_schema, parse, to_xml
+from weirding._exceptions import SchemaError
 
-from weirding import compile, from_schema, parse, to_xml  # noqa: E402
-from weirding._exceptions import SchemaError  # noqa: E402
+xmlschema = pytest.importorskip("xmlschema")
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -172,11 +172,13 @@ class TestFlatXSD:
 class TestDateTimeFormats:
     def test_date_format(self):
         ir = compile(DATE_XSD)
-        assert ir["properties"]["start_date"] == {"type": "string", "format": "date"}
+        assert ir["properties"]["start_date"] == {
+            "type": "string", "format": "date"}
 
     def test_time_format(self):
         ir = compile(DATE_XSD)
-        assert ir["properties"]["start_time"] == {"type": "string", "format": "time"}
+        assert ir["properties"]["start_time"] == {
+            "type": "string", "format": "time"}
 
     def test_datetime_format(self):
         ir = compile(DATE_XSD)
@@ -244,7 +246,8 @@ class TestArrayXSD:
 class TestEnumXSD:
     def test_enum_values(self):
         ir = compile(ENUM_XSD)
-        assert ir["properties"]["status"]["enum"] == ["pending", "active", "closed"]
+        assert ir["properties"]["status"]["enum"] == [
+            "pending", "active", "closed"]
 
     def test_enum_base_type(self):
         ir = compile(ENUM_XSD)

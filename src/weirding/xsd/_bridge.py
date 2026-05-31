@@ -9,7 +9,11 @@ See ADR-0006 for library choice rationale, security posture, and type-map
 key format (Clark-notation URIs, never xs:-prefixed names).
 """
 
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
+
 from __future__ import annotations
+
+from typing import Any
 
 import xmlschema
 from lxml import etree
@@ -77,7 +81,7 @@ _XSD_TYPE_MAP: dict[str, dict] = {
 }
 
 
-def _type_to_ir(xsd_type) -> dict:
+def _type_to_ir(xsd_type: Any) -> dict:
     """Map an xmlschema type object to a JSON Schema IR fragment."""
     name = getattr(xsd_type, "name", None)
     if name is None:
@@ -90,7 +94,7 @@ def _type_to_ir(xsd_type) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def _iter_elements(complex_type):
+def _iter_elements(complex_type: Any):
     """Yield element declarations from a complex type's model group.
 
     Guards against xs:simpleContent (content is not a group — not iterable).
@@ -108,7 +112,7 @@ def _iter_elements(complex_type):
 # ---------------------------------------------------------------------------
 
 
-def _type_to_schema(xsd_type) -> dict:
+def _type_to_schema(xsd_type: Any) -> dict:
     """Convert an xmlschema type object to a JSON Schema IR fragment."""
     from xmlschema.validators import XsdComplexType
 
@@ -129,7 +133,7 @@ def _type_to_schema(xsd_type) -> dict:
     return _type_to_ir(xsd_type)
 
 
-def _choice_to_ir(choice_group) -> dict:
+def _choice_to_ir(choice_group: Any) -> dict:
     """Convert an xs:choice group to a JSON Schema oneOf."""
     branches = []
     for elem_decl in choice_group:
@@ -144,7 +148,7 @@ def _choice_to_ir(choice_group) -> dict:
     return {"oneOf": branches}
 
 
-def _complex_type_to_ir(complex_type) -> dict:
+def _complex_type_to_ir(complex_type: Any) -> dict:
     """Convert an XsdComplexType to a JSON Schema object fragment."""
     from xmlschema.validators import XsdGroup
 
@@ -178,7 +182,7 @@ def _complex_type_to_ir(complex_type) -> dict:
         properties[field_name] = field_ir
 
         min_occurs = getattr(elem_decl, "min_occurs", 1)
-        if min_occurs != 0:
+        if min_occurs != 0 and field_name is not None:
             required.append(field_name)
 
     schema: dict = {"type": "object", "properties": properties}
@@ -187,7 +191,7 @@ def _complex_type_to_ir(complex_type) -> dict:
     return schema
 
 
-def _elem_decl_to_ir(elem_decl) -> dict:
+def _elem_decl_to_ir(elem_decl: Any) -> dict:
     """Convert an element declaration to a JSON Schema IR fragment.
 
     Handles arrays (maxOccurs > 1 or unbounded) and delegates to

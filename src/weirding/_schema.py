@@ -12,9 +12,6 @@ from weirding._parser import make_parser
 _XSD_NS = "http://www.w3.org/2001/XMLSchema"
 _XSD_SCHEMA_TAG = f"{{{_XSD_NS}}}schema"
 
-# Attribute names that control structural dispatch rather than JSON Schema keywords
-_STRUCTURAL_ATTRS = frozenset({"type", "required", "nullable"})
-
 # Dispatch table: attribute name → (schema key, converter)
 # min/max are excluded because they depend on the sibling ``type`` attribute.
 # enum is excluded because its values must be coerced to match the declared type.
@@ -42,7 +39,7 @@ def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
 
     for attr_name, (schema_key, converter) in _ATTR_DISPATCH.items():
         if attr_name in attrib:
-            schema[schema_key] = converter(attrib[attr_name])
+            schema[schema_key] = converter(str(attrib[attr_name]))
 
     # ``min`` → minLength (string) or minItems (array)
     if "min" in attrib:
@@ -63,7 +60,7 @@ def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
     # ``enum`` — values coerced to match the declared field type
     if "enum" in attrib:
         current_type = attrib.get("type", "string")
-        raw_values = attrib["enum"].split("|")
+        raw_values = str(attrib["enum"]).split("|")
         if current_type == "integer":
             schema["enum"] = [int(v) for v in raw_values]
         elif current_type == "number":
