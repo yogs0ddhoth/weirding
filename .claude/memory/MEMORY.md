@@ -64,3 +64,42 @@ agents. Never run verbose or iterative commands in the main session.
 - **XSD bridge (`src/weirding/xsd/_bridge.py`)**: `xmlschema.XMLSchema(root_element, defuse="always")` — pass the already-parsed lxml element, always `defuse="always"` (NOT remote or default). Type map keys are Clark-notation URIs (`{http://www.w3.org/2001/XMLSchema}string`), NOT `xs:`-prefixed names. `_iter_elements()` guards against `xs:simpleContent` via `isinstance(content, XsdGroup)` — without this guard, simpleContent raises TypeError. XSD bridge never emits `"additionalProperties": false`; `extra="forbid"` patch does not fire for XSD-derived models (intentional). ADR-0006 documents library choice and security posture (pending authoring).
 - **Future capability targets** (inform all design decisions): enterprise document ingestion (Word/Office Open XML, Excel XLSX), Anthropic structured output and XML capabilities, Kubernetes MCP server/gateway payloads, Databricks AI-aided data science and ETL pipelines. Attribute convention and IR design must remain idiomatic XML across all these contexts.
 - Prototype at `C:\Users\becom\Developer\Lithium\packages\xml-pydantic` — port `schema.py` (native-XML annotation compiler) and `serializers.py` (model→XML); replace `ET.fromstring()` with `make_parser()`; replace `datamodel-code-generator` with `json-schema-to-pydantic`. Note: prototype used `data-*`; do NOT carry that convention forward.
+- **Docstring style:** Google-style enforced by `ruff D, convention = "google"`. Protocol
+  method stubs require one-liner docstrings (D102). Test files fully exempt via
+  `per-file-ignores = ["D"]`. Do not enable DOC rules (DOC201/DOC501) — unstable in ruff 0.15.
+
+- **`pytest.mark.parametrize` policy:** Class-based grouping preferred for fixture-driven
+  suites (see `test_xsd.py`). `@pytest.mark.parametrize` allowed and encouraged for
+  tabular/data-driven cases with >3 inputs. No blanket prohibition.
+
+- **Coverage threshold:** `--cov-fail-under=N` enforced in `pyproject.toml` addopts (set
+  Phase 1). Never lower this value to make a failing test pass — fix the missing coverage.
+
+- **IR version stability contract:** `JsonSchemaIR` format changes that remove or rename
+  existing keys are breaking changes (semver **major**). Additions of new optional keys
+  (including new `x-weirding-*` extension keys) are **minor**. Applies regardless of whether
+  the change also modifies a Python function signature. Recorded in ADR-0002 appendix.
+
+- **Async policy:** weirding is synchronous by design (`lxml` is synchronous; no async
+  needed for 1–50KB AI payloads). No async support until a concrete streaming use case is
+  confirmed and benchmarked. Do not accept PRs adding `async`/`await` to the public pipeline
+  without a new plan and ADR.
+
+- **Logging policy:** weirding emits no log statements. Callers own their observability
+  stack. Adding logging to library code requires explicit approval — it risks capturing user
+  data in caller log sinks (privacy violation per ETHOS.md).
+
+- **Dependency pinning strategy:** Single-maintainer 0.x packages must be pinned
+  `>=X.Y.Z,<NEXT_MAJOR` (e.g., `json-schema-to-pydantic>=0.4.7,<1`). Stable
+  multi-maintainer packages use `>=X.Y` open upper bounds. Never add a new single-maintainer
+  0.x dep without documenting the escape hatch in an ADR.
+
+- **PydanticBuilder placement:** Protocol implementations belong in the module that owns
+  the capability (`_models.py`), not in the routing module (`__init__.py`). Current
+  `PydanticBuilder` location is documented technical debt; relocation is a separate
+  ADR-gated plan. Do not add more Protocol implementations to `__init__.py`.
+
+- **PBT file separation:** Hypothesis property-based tests must live in `*_pbt.py` files
+  separate from deterministic tests. Use `pytest -k "not pbt"` for fast-iteration runs.
+  Settings: `@settings(max_examples=100)` for leaf strategies, `@settings(max_examples=30)`
+  for recursive tree strategies. Commit `.hypothesis/` directory (small; enables CI replay).

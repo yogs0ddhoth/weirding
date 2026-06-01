@@ -119,3 +119,21 @@ It is a one-call shortcut; the builder parameter threads through.
   what subset they receive.
 - Future dialect compilers (XSD in Phase 03) must emit the same IR shape with the same
   restrictions. The IR spec is dialect-agnostic.
+
+## Appendix: IR Format Evolution Policy
+
+*Added 2026-06-01*
+
+Because `compile()` exposes `JsonSchemaIR` as a public return value, changes to the IR
+format are governed by the same semver rules as Python API changes:
+
+- **Major (breaking):** removing a key that downstream callers may read, or renaming a key
+  that has documented semantics (e.g., renaming `"x-weirding-item-tag"` to anything else).
+- **Minor (additive):** adding a new optional key to the emitted dict. Callers that do not
+  read the new key are unaffected.
+- **Patch / no bump:** fixes to values under existing keys that do not change the key's
+  documented semantics (e.g., correcting a `"type"` value that was wrong).
+
+This policy applies to every dialect's output — native-annotation, XSD, and any future
+dialect added via the `DTOBuilder` Protocol. All dialect converters must produce IR that
+satisfies the same structural contract.
