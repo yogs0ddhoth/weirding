@@ -19,7 +19,6 @@ def _render_scalar(value: Any) -> str:
     bool → "true" / "false" (not Python's True/False).
     Everything else → str(value).
     """
-
     if isinstance(value, bool):
         return "true" if value else "false"
     return str(value)

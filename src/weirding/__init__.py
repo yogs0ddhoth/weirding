@@ -1,3 +1,5 @@
+"""weirding public API: compile, from_schema, define_model, parse, to_xml."""
+
 from __future__ import annotations
 
 import re
@@ -55,7 +57,9 @@ class Validatable(Protocol):
     """
 
     @classmethod
-    def model_validate(cls, obj: dict[str, Any]) -> Any: ...
+    def model_validate(cls, obj: dict[str, Any]) -> Any:
+        """Validate data dict and return a model instance."""
+        ...
 
 
 @runtime_checkable
@@ -70,7 +74,9 @@ class DTOBuilder(Protocol):
     Pydantic is the default, not the requirement.
     """
 
-    def build(self, schema: JsonSchemaIR, *, name: str) -> type: ...
+    def build(self, schema: JsonSchemaIR, *, name: str) -> type:
+        """Build and return a DTO class from the given JSON Schema IR."""
+        ...
 
 
 class PydanticBuilder:
@@ -82,6 +88,7 @@ class PydanticBuilder:
     """
 
     def build(self, schema: JsonSchemaIR, *, name: str = "Model") -> type[BaseModel]:
+        """Build a Pydantic BaseModel subclass from the given JSON Schema IR."""
         from weirding._models import build_model
 
         return build_model(schema, name=name)
@@ -106,6 +113,7 @@ def compile(xml: str | bytes) -> JsonSchemaIR:
         SchemaError: schema document is structurally invalid.
         UnsupportedDialectError: dialect cannot be detected or is unsupported.
         ParseError: xml is not well-formed.
+
     """
     return compile_schema(xml)
 
@@ -149,6 +157,7 @@ def from_schema(
 
     Raises:
         SchemaError: schema cannot be converted to a valid typed class.
+
     """
     return (builder or PydanticBuilder()).build(schema, name=name)
 
@@ -158,7 +167,7 @@ def define_model(
     *,
     builder: DTOBuilder | None = None,
 ) -> type:
-    """Convenience: compile(xml) then from_schema(), naming the type from the root tag.
+    """Compile XML then build a typed DTO, naming the type from the root element tag.
 
     Equivalent to:
         schema = compile(xml)
@@ -170,6 +179,7 @@ def define_model(
 
     Returns:
         A new type produced by the builder.
+
     """
     schema = compile(xml)
     name = _sanitize_name(schema.get("title", "Model"))
@@ -192,6 +202,7 @@ def parse(xml: str | bytes, model: type[Validatable]) -> Any:
 
     Raises:
         ParseError: xml is malformed or fails model validation.
+
     """
     parser = make_parser()
     try:
@@ -224,5 +235,6 @@ def to_xml(instance: BaseModel) -> str:
 
     Returns:
         UTF-8 XML string without an XML declaration.
+
     """
     return _to_xml(instance)

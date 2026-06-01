@@ -238,6 +238,7 @@ def xsd_to_ir(root: etree._Element) -> JsonSchemaIR:
     Raises:
         SchemaError: The XSD has no top-level element declarations, or the
                      document is structurally invalid.
+
     """
     try:
         xs = xmlschema.XMLSchema(root, defuse="always")
