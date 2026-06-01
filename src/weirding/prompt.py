@@ -1,3 +1,5 @@
+"""Prompt engineering utilities for LLM structured-output retry workflows."""
+
 from __future__ import annotations
 
 import types as _types
@@ -134,6 +136,7 @@ class RetryContext:
     """
 
     def __init__(self, model: type[BaseModel], max_attempts: int = 3) -> None:
+        """Initialize with the given model and an optional max-attempts limit."""
         self._model = model
         self._max_attempts = max_attempts
         self._attempt = 0
@@ -141,17 +144,21 @@ class RetryContext:
 
     @property
     def attempt(self) -> int:
+        """Return the current attempt number (0-based before first error)."""
         return self._attempt
 
     @property
     def exceeded(self) -> bool:
+        """Return True if the maximum number of retry attempts has been reached."""
         return self._attempt >= self._max_attempts
 
     def record_error(self, error: Exception) -> None:
+        """Record a validation error and increment the attempt counter."""
         self._attempt += 1
         self._last_message = format_error(error, model=self._model)
 
     def retry_message(self) -> str:
+        """Return the formatted error message from the last recorded error."""
         return self._last_message or ""
 
 
@@ -167,6 +174,7 @@ def to_template(model: type[BaseModel]) -> str:
 
     Returns:
         XML string showing the expected output format.
+
     """
     root = etree.Element(model.__name__)
     _render_model_fields(root, model)
@@ -211,6 +219,7 @@ def format_error(error: Exception, *, model: type[BaseModel]) -> str:
 
     Returns:
         Plain text description of the validation failures.
+
     """
     # Unwrap ParseError — weirding raises ParseError(str(exc)) from exc
     if isinstance(error, ParseError) and isinstance(

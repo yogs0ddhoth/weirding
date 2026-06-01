@@ -16,7 +16,6 @@ def build_model(schema: JsonSchemaIR, *, name: str = "Model") -> type[BaseModel]
       - schema["additionalProperties"] == False  →  model_config extra="forbid"
       - prefixItems must never appear in schema (enforced by _schema.py, not here)
     """
-
     try:
         model = create_model(schema)
     except (LibSchemaError, LibTypeError, CombinerError, ReferenceError) as exc:

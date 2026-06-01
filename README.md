@@ -86,6 +86,16 @@ Use the human identity from `git config user.name` and `git config user.email`. 
 exact Claude model ID from the active session (e.g. `claude-sonnet-4-6`). This applies
 to all commits on Claude-assisted branches — not just the merge commit.
 
+**`JsonSchemaIR` format stability contract**
+
+`compile()` returns a public `JsonSchemaIR` dict. Changes to that dict's format follow the same semver rules:
+
+- **Major:** removing or renaming existing keys (breaks downstream callers that read the dict)
+- **Minor:** adding new optional keys, including new `x-weirding-*` extension keys
+- **No bump:** adding keys that are only consumed internally and never appear in `compile()` output
+
+See ADR-0002 for rationale.
+
 ### Without Claude Code
 
 You do not need Claude Code to contribute. Use the commands in `CLAUDE.md`'s Commands table directly in your terminal — build, test, lint, and format are all plain shell commands. Read `docs/adr/` before touching a component that has a recorded decision, and open a PR when your branch is ready.

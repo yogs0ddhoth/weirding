@@ -586,7 +586,7 @@ xsd = [
 
 [package.metadata]
 requires-dist = [
-    { name = "json-schema-to-pydantic", specifier = ">=0.4" },
+    { name = "json-schema-to-pydantic", specifier = ">=0.4.7,<1" },
     { name = "lxml", specifier = ">=6.1.1" },
     { name = "lxml-stubs", marker = "extra == 'dev'", specifier = ">=0.5" },
     { name = "pydantic", specifier = ">=2.13.4" },
