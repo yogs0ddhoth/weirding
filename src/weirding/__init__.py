@@ -17,9 +17,11 @@ from weirding._parser import make_parser
 from weirding._schema import compile_schema
 from weirding._serializers import _xml_to_dict
 from weirding._serializers import to_xml as _to_xml
+from weirding._types import JsonSchemaIR
 
 __all__ = [
     "DTOBuilder",
+    "JsonSchemaIR",
     "ParseError",
     "PydanticBuilder",
     "SchemaError",
@@ -68,7 +70,7 @@ class DTOBuilder(Protocol):
     Pydantic is the default, not the requirement.
     """
 
-    def build(self, schema: dict, *, name: str) -> type: ...
+    def build(self, schema: JsonSchemaIR, *, name: str) -> type: ...
 
 
 class PydanticBuilder:
@@ -79,13 +81,13 @@ class PydanticBuilder:
       - prefixItems must never appear in schema (enforced by _schema.py)
     """
 
-    def build(self, schema: dict, *, name: str = "Model") -> type[BaseModel]:
+    def build(self, schema: JsonSchemaIR, *, name: str = "Model") -> type[BaseModel]:
         from weirding._models import build_model
 
         return build_model(schema, name=name)
 
 
-def compile(xml: str | bytes) -> dict:
+def compile(xml: str | bytes) -> JsonSchemaIR:
     """Convert an XML schema document to a JSON Schema IR dict.
 
     The JSON Schema dict is the core product of weirding. It can be consumed
@@ -109,19 +111,23 @@ def compile(xml: str | bytes) -> dict:
 
 
 @overload
-def from_schema(schema: dict, *, name: str = ...) -> type[BaseModel]: ...
+def from_schema(schema: JsonSchemaIR, *, name: str = ...) -> type[BaseModel]: ...
 
 
 @overload
-def from_schema(schema: dict, *, name: str = ..., builder: None) -> type[BaseModel]: ...
+def from_schema(
+    schema: JsonSchemaIR, *, name: str = ..., builder: None
+) -> type[BaseModel]: ...
 
 
 @overload
-def from_schema(schema: dict, *, name: str = ..., builder: DTOBuilder) -> type: ...
+def from_schema(
+    schema: JsonSchemaIR, *, name: str = ..., builder: DTOBuilder
+) -> type: ...
 
 
 def from_schema(
-    schema: dict,
+    schema: JsonSchemaIR,
     *,
     name: str = "Model",
     builder: DTOBuilder | None = None,

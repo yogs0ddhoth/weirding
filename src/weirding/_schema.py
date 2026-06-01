@@ -7,6 +7,7 @@ from lxml import etree
 
 from weirding._exceptions import ParseError, UnsupportedDialectError
 from weirding._parser import make_parser
+from weirding._types import JsonSchemaIR
 
 # XSD namespace URI — root element in this namespace triggers UnsupportedDialectError
 _XSD_NS = "http://www.w3.org/2001/XMLSchema"
@@ -79,7 +80,7 @@ def _wrap_nullable(schema: dict[str, Any]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def _element_to_schema(element: etree._Element) -> dict[str, Any]:
+def _element_to_schema(element: etree._Element) -> JsonSchemaIR:
     """Recursively convert *element* to a JSON Schema fragment."""
     attrib = element.attrib
     explicit_type = attrib.get("type", "")
@@ -149,7 +150,7 @@ def _local_tag(element: etree._Element) -> str:
 # ---------------------------------------------------------------------------
 
 
-def compile_schema(xml: str | bytes) -> dict:
+def compile_schema(xml: str | bytes) -> JsonSchemaIR:
     """Parse an XML schema document into a JSON Schema IR dict.
 
     Uses the plain-attribute annotation convention. Never emits prefixItems —

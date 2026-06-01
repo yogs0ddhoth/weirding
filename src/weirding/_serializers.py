@@ -1,3 +1,5 @@
+"""XML ↔ Python object codecs: to_xml (serialize) and _xml_to_dict (deserialize)."""
+
 from __future__ import annotations
 
 from typing import Any, get_args, get_origin
@@ -127,12 +129,10 @@ def _is_list_field(annotation: Any) -> bool:
     return get_origin(annotation) is list
 
 
-def _xml_to_dict(
-    element: etree._Element, model_type: type[BaseModel]
-) -> dict[str, Any]:
-    """Convert an lxml element tree into a dict for ``model_type.model_validate()``.
+def _xml_to_dict(element: etree._Element, model_cls: type[BaseModel]) -> dict[str, Any]:
+    """Convert an lxml element tree into a dict for ``model_cls.model_validate()``.
 
-    Uses ``model_type.model_fields`` to drive the conversion — schema-aware, not
+    Uses ``model_cls.model_fields`` to drive the conversion — schema-aware, not
     naive same-tag coalescing.
 
     Returns a dict of ``{field_name: value}`` derived from *element*'s children.
@@ -146,7 +146,7 @@ def _xml_to_dict(
         if isinstance(tag, str):  # skip processing instructions / comments
             children_by_tag.setdefault(tag, []).append(child)
 
-    for field_name, field_info in model_type.model_fields.items():
+    for field_name, field_info in model_cls.model_fields.items():
         annotation = field_info.annotation
         child_elements = children_by_tag.get(field_name, [])
 

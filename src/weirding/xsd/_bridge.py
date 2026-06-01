@@ -19,6 +19,7 @@ import xmlschema
 from lxml import etree
 
 from weirding._exceptions import SchemaError
+from weirding._types import JsonSchemaIR
 
 _XSD_NS = "http://www.w3.org/2001/XMLSchema"
 
@@ -31,7 +32,7 @@ def _xsd_key(local: str) -> str:
 # Type map — keys are Clark-notation URIs (NOT xs:-prefixed names)
 # ---------------------------------------------------------------------------
 
-_XSD_TYPE_MAP: dict[str, dict] = {
+_XSD_TYPE_MAP: dict[str, JsonSchemaIR] = {
     # string-like
     **{
         _xsd_key(t): {"type": "string"}
@@ -81,7 +82,7 @@ _XSD_TYPE_MAP: dict[str, dict] = {
 }
 
 
-def _type_to_ir(xsd_type: Any) -> dict:
+def _primitive_to_ir(xsd_type: Any) -> JsonSchemaIR:
     """Map an xmlschema type object to a JSON Schema IR fragment."""
     name = getattr(xsd_type, "name", None)
     if name is None:
@@ -112,14 +113,14 @@ def _iter_elements(complex_type: Any):
 # ---------------------------------------------------------------------------
 
 
-def _type_to_schema(xsd_type: Any) -> dict:
+def _type_to_schema(xsd_type: Any) -> JsonSchemaIR:
     """Convert an xmlschema type object to a JSON Schema IR fragment."""
     from xmlschema.validators import XsdComplexType
 
     # Enum: restriction with enumeration facets
     if hasattr(xsd_type, "enumeration") and xsd_type.enumeration:
         base_ir = (
-            _type_to_ir(xsd_type.base_type)
+            _primitive_to_ir(xsd_type.base_type)
             if hasattr(xsd_type, "base_type")
             else {"type": "string"}
         )
@@ -130,10 +131,10 @@ def _type_to_schema(xsd_type: Any) -> dict:
         return _complex_type_to_ir(xsd_type)
 
     # Scalar
-    return _type_to_ir(xsd_type)
+    return _primitive_to_ir(xsd_type)
 
 
-def _choice_to_ir(choice_group: Any) -> dict:
+def _choice_to_ir(choice_group: Any) -> JsonSchemaIR:
     """Convert an xs:choice group to a JSON Schema oneOf."""
     branches = []
     for elem_decl in choice_group:
@@ -148,13 +149,13 @@ def _choice_to_ir(choice_group: Any) -> dict:
     return {"oneOf": branches}
 
 
-def _complex_type_to_ir(complex_type: Any) -> dict:
+def _complex_type_to_ir(complex_type: Any) -> JsonSchemaIR:
     """Convert an XsdComplexType to a JSON Schema object fragment."""
     from xmlschema.validators import XsdGroup
 
     content = getattr(complex_type, "content", None)
     if not isinstance(content, XsdGroup):
-        return _type_to_ir(complex_type)
+        return _primitive_to_ir(complex_type)
 
     if content.model == "choice":
         return _choice_to_ir(content)
@@ -191,7 +192,7 @@ def _complex_type_to_ir(complex_type: Any) -> dict:
     return schema
 
 
-def _elem_decl_to_ir(elem_decl: Any) -> dict:
+def _elem_decl_to_ir(elem_decl: Any) -> JsonSchemaIR:
     """Convert an element declaration to a JSON Schema IR fragment.
 
     Handles arrays (maxOccurs > 1 or unbounded) and delegates to
@@ -223,7 +224,7 @@ def _elem_decl_to_ir(elem_decl: Any) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def xsd_to_ir(root: etree._Element) -> dict:
+def xsd_to_ir(root: etree._Element) -> JsonSchemaIR:
     """Convert an xs:schema lxml element to a JSON Schema IR dict.
 
     Args:
