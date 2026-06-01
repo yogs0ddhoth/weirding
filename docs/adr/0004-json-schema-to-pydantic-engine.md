@@ -128,3 +128,21 @@ required runtime dependency (`json-schema-to-pydantic>=0.4`).
   the IR compiler, not a temporary workaround. Even if `json-schema-to-pydantic` adds
   `prefixItems` support in a future release, weirding's IR will not emit it — positional
   sequences as named-field objects produce better Pydantic models and better LLM output.
+
+
+## Escape Hatch
+
+If `json-schema-to-pydantic` becomes unmaintained or incompatible with a future Pydantic
+release, the migration target is a hand-rolled `pydantic.create_model()` loop. The entire
+swap is confined to `src/weirding/_models.py:build_model()` — no public API changes are
+required. The `DTOBuilder` Protocol and `PydanticBuilder.build()` interface remain unchanged;
+only the engine call inside `build_model()` changes.
+
+The keyword surface weirding's IR actually emits is intentionally constrained (no
+`prefixItems`, no `unevaluatedProperties`, no `if/then/else`), which makes a custom
+implementation materially smaller than a general-purpose JSON Schema converter. The
+LangChain pattern (hand-rolled `pydantic.create_model()` over `properties` + `required` +
+`anyOf`/`allOf` recursion) is the reference implementation.
+
+Migration trigger: `uv run pytest` fails after a `pydantic` minor-release update in a way
+that Patch 1 post-construction config mutation cannot fix.
