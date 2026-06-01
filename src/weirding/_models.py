@@ -5,9 +5,10 @@ from json_schema_to_pydantic.exceptions import TypeError as LibTypeError
 from pydantic import BaseModel, ConfigDict
 
 from weirding._exceptions import SchemaError
+from weirding._types import JsonSchemaIR
 
 
-def build_model(schema: dict, *, name: str = "Model") -> type[BaseModel]:
+def build_model(schema: JsonSchemaIR, *, name: str = "Model") -> type[BaseModel]:
     """Convert a JSON Schema IR dict to a Pydantic v2 BaseModel class.
 
     Engine: json-schema-to-pydantic.

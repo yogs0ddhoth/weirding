@@ -8,7 +8,7 @@ future agent would need to avoid re-litigating.
 ## Core Facts
 
 - **Language / Stack:** Python 3.11+, pydantic>=2.0, lxml>=4.9.2, json-schema-to-pydantic>=0.4, uv
-- **Current phase:** Phase 02 — Prompt Utilities (complete)
+- **Current phase:** Phase 03 — XSD Support (complete); next: Phase 04 — Distribution
 - **Framework version:** 0.3.0
 - **Roadmap:** `docs/planning/PROJECT_ROADMAP.md`
 - **ADRs:** `docs/adr/` — read before touching any component
@@ -27,6 +27,7 @@ future agent would need to avoid re-litigating.
 10. JSON Schema dict is the canonical IR and IS publicly exposed via `weirding.compile(xml) -> dict`. All dialect parsers produce it; all model generators consume it. Its structure follows JSON Schema draft 2020-12.
 11. `prefixItems` is banned from the JSON Schema IR weirding emits. The library `json-schema-to-pydantic` does not support it. Positional sequences must be represented as named-field objects instead.
 12. After `json-schema-to-pydantic` builds a model from a schema with `"additionalProperties": false`, weirding must set `model_config = ConfigDict(extra="forbid")` on that model — the library recognizes the keyword but does not enforce it.
+13. Zero pyright errors — `uv run pyright` must exit 0 before every commit. Config: `[tool.pyright]` in `pyproject.toml`, `typeCheckingMode = "standard"`, `reportMissingTypeStubs = "none"`. Note: pyright downloads its Node binary on first run — may fail in network-isolated CI; Phase 04 CI/CD configuration must address this.
 
 ## Agent Dispatch Mandate
 
@@ -47,9 +48,10 @@ agents. Never run verbose or iterative commands in the main session.
 
 - **Schema annotation convention: plain unnamespaced attributes** (ADR-0001 — Accepted 2026-05-06). Canonical attribute vocabulary: `type`, `required` (default `"true"`), `description`, `enum` (pipe-separated), `pattern`, `minimum`, `maximum`, `min` (→`minLength`/`minItems`), `max` (→`maxLength`/`maxItems`), `default`, `nullable` (→ `anyOf: [{type: T}, {type: null}]`, draft 2020-12 form). Array fields use `type="array"` with a single child element as item template; the child tag is stored as `x-weirding-item-tag` in the IR (ADR-0005 pending). `data-*` and namespace-prefixed conventions explicitly rejected. XSD rejected as primary authoring format — too verbose for LLM prompt templates, no maintained Python runtime converter exists.
 - **Dialect auto-detection in `define_model()`**: root element `{http://www.w3.org/2001/XMLSchema}schema` → XSD path; presence of weirding annotation attributes in the tree → native-annotation path; neither → `UnsupportedDialectError`
+- **`JsonSchemaIR` type alias** (added 2026-05-31): `src/weirding/_types.py` declares `JsonSchemaIR: TypeAlias = dict[str, Any]`. Applied across all 5 IR-handling modules. Exported from `weirding.__all__` — callers may annotate `schema: weirding.JsonSchemaIR`. Alias is pyright-transparent (no cast sites required). `_types.py` deliberately omits `from __future__ import annotations` — the one exception to the project-wide pattern; deferring annotations in a types-only module is a footgun. `_XSD_TYPE_MAP` in `_bridge.py` typed `dict[str, JsonSchemaIR]`. `_type_to_ir` renamed → `_primitive_to_ir` (pure map-lookup, not general converter).
 - **Public API surface** (all in `weirding.__init__`):
-  - `compile(xml: str | bytes) -> dict` — XML schema → JSON Schema IR dict (the core product; publicly exposed)
-  - `from_schema(schema: dict, *, name: str = "Model", builder: DTOBuilder | None = None) -> type` — JSON Schema IR → typed DTO class; default builder is `PydanticBuilder()` → `type[BaseModel]`; overloaded for static type safety
+  - `compile(xml: str | bytes) -> JsonSchemaIR` — XML schema → JSON Schema IR dict (the core product; publicly exposed)
+  - `from_schema(schema: JsonSchemaIR, *, name: str = "Model", builder: DTOBuilder | None = None) -> type` — JSON Schema IR → typed DTO class; default builder is `PydanticBuilder()` → `type[BaseModel]`; overloaded for static type safety
   - `define_model(xml: str | bytes, *, builder: DTOBuilder | None = None) -> type` — convenience: `from_schema(compile(xml), name=<root_tag>, builder=builder)`
   - `parse(xml: str | bytes, model: Validatable) -> Any` — XML data → validated instance; `model` parameter is a `Validatable` Protocol
   - `to_xml(instance: BaseModel) -> str` — model instance → XML string
@@ -58,6 +60,7 @@ agents. Never run verbose or iterative commands in the main session.
 - **`Validatable` Protocol**: `def model_validate(cls, data: dict[str, Any]) -> Any` classmethod. Satisfied by every Pydantic `BaseModel` subclass. Allows `parse()` to work with future non-Pydantic validators without changing the public signature.
 - **Model name derivation**: root XML element tag, sanitized to a valid Python identifier (`re.sub(r'[^A-Za-z0-9_]', '_', tag).lstrip('0123456789') or 'Model'`). Passed as `name` to `from_schema()`.
 - **`json-schema-to-pydantic>=0.4` confirmed** as the engine for `build_model()` / `from_schema()`. Two weirding-owned patches required: (1) post-creation `extra="forbid"` when schema has `"additionalProperties": false`; (2) IR compiler never emits `prefixItems` (rule 11).
-- Base dependencies: `pydantic>=2.0`, `lxml>=4.9.2`, `json-schema-to-pydantic>=0.4`
+- Base dependencies: `pydantic>=2.0`, `lxml>=4.9.2`, `json-schema-to-pydantic>=0.4`; XSD optional dep: `xmlschema>=3.0` (in `[xsd]` extra only)
+- **XSD bridge (`src/weirding/xsd/_bridge.py`)**: `xmlschema.XMLSchema(root_element, defuse="always")` — pass the already-parsed lxml element, always `defuse="always"` (NOT remote or default). Type map keys are Clark-notation URIs (`{http://www.w3.org/2001/XMLSchema}string`), NOT `xs:`-prefixed names. `_iter_elements()` guards against `xs:simpleContent` via `isinstance(content, XsdGroup)` — without this guard, simpleContent raises TypeError. XSD bridge never emits `"additionalProperties": false`; `extra="forbid"` patch does not fire for XSD-derived models (intentional). ADR-0006 documents library choice and security posture (pending authoring).
 - **Future capability targets** (inform all design decisions): enterprise document ingestion (Word/Office Open XML, Excel XLSX), Anthropic structured output and XML capabilities, Kubernetes MCP server/gateway payloads, Databricks AI-aided data science and ETL pipelines. Attribute convention and IR design must remain idiomatic XML across all these contexts.
 - Prototype at `C:\Users\becom\Developer\Lithium\packages\xml-pydantic` — port `schema.py` (native-XML annotation compiler) and `serializers.py` (model→XML); replace `ET.fromstring()` with `make_parser()`; replace `datamodel-code-generator` with `json-schema-to-pydantic`. Note: prototype used `data-*`; do NOT carry that convention forward.

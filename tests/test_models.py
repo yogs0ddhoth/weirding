@@ -48,7 +48,7 @@ def test_nested_object_produces_nested_model() -> None:
     }
     Model = build_model(schema)
     address_annotation = Model.model_fields["address"].annotation
-    assert issubclass(address_annotation, BaseModel)
+    assert issubclass(address_annotation, BaseModel)  # type: ignore[arg-type]
     instance = Model.model_validate(
         {"address": {"street": "Main St", "city": "Springfield"}}
     )

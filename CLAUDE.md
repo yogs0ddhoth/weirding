@@ -19,6 +19,7 @@ runnable — no prose, no approximations.
 | Test       | uv run pytest                  |
 | Lint       | uv run ruff check .            |
 | Format     | uv run ruff format .           |
+| Type Check | uv run pyright                 |
 | Deploy     | uv publish                     |
 
 ## Development Workflow [UNIVERSAL]

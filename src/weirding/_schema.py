@@ -7,13 +7,11 @@ from lxml import etree
 
 from weirding._exceptions import ParseError, UnsupportedDialectError
 from weirding._parser import make_parser
+from weirding._types import JsonSchemaIR
 
 # XSD namespace URI — root element in this namespace triggers UnsupportedDialectError
 _XSD_NS = "http://www.w3.org/2001/XMLSchema"
 _XSD_SCHEMA_TAG = f"{{{_XSD_NS}}}schema"
-
-# Attribute names that control structural dispatch rather than JSON Schema keywords
-_STRUCTURAL_ATTRS = frozenset({"type", "required", "nullable"})
 
 # Dispatch table: attribute name → (schema key, converter)
 # min/max are excluded because they depend on the sibling ``type`` attribute.
@@ -42,7 +40,7 @@ def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
 
     for attr_name, (schema_key, converter) in _ATTR_DISPATCH.items():
         if attr_name in attrib:
-            schema[schema_key] = converter(attrib[attr_name])
+            schema[schema_key] = converter(str(attrib[attr_name]))
 
     # ``min`` → minLength (string) or minItems (array)
     if "min" in attrib:
@@ -63,7 +61,7 @@ def _apply_attrs(element: etree._Element, schema: dict[str, Any]) -> None:
     # ``enum`` — values coerced to match the declared field type
     if "enum" in attrib:
         current_type = attrib.get("type", "string")
-        raw_values = attrib["enum"].split("|")
+        raw_values = str(attrib["enum"]).split("|")
         if current_type == "integer":
             schema["enum"] = [int(v) for v in raw_values]
         elif current_type == "number":
@@ -82,7 +80,7 @@ def _wrap_nullable(schema: dict[str, Any]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def _element_to_schema(element: etree._Element) -> dict[str, Any]:
+def _element_to_schema(element: etree._Element) -> JsonSchemaIR:
     """Recursively convert *element* to a JSON Schema fragment."""
     attrib = element.attrib
     explicit_type = attrib.get("type", "")
@@ -152,7 +150,7 @@ def _local_tag(element: etree._Element) -> str:
 # ---------------------------------------------------------------------------
 
 
-def compile_schema(xml: str | bytes) -> dict:
+def compile_schema(xml: str | bytes) -> JsonSchemaIR:
     """Parse an XML schema document into a JSON Schema IR dict.
 
     Uses the plain-attribute annotation convention. Never emits prefixItems —
@@ -172,7 +170,11 @@ def compile_schema(xml: str | bytes) -> dict:
         raise ParseError(str(exc)) from exc
 
     if root.tag == _XSD_SCHEMA_TAG:
-        raise UnsupportedDialectError("XSD support requires weirding[xsd]")
+        try:
+            from weirding.xsd._bridge import xsd_to_ir
+        except ImportError as exc:
+            raise UnsupportedDialectError("XSD support requires weirding[xsd]") from exc
+        return xsd_to_ir(root)
 
     root_tag = _local_tag(root)
     children = list(root)

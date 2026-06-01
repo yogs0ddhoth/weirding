@@ -9,18 +9,20 @@ description = "XML ↔ Pydantic v2 conversion for structured AI output workflows
 requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = [
-    "pydantic>=2.0",
-    "lxml>=4.9.2",
+    "pydantic>=2.13.4",
+    "lxml>=6.1.1",
     "json-schema-to-pydantic>=0.4",
 ]
 
 [project.optional-dependencies]
-xsd = []
+xsd = ["xmlschema>=3.0"]
 dev = [
     "pytest>=8.0",
     "pytest-cov",
-    "ruff>=0.4",
+    "ruff>=0.15.15",
     "lxml-stubs>=0.5",
+    "weirding[xsd]",
+    "pyright>=1.1.390,<2",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -32,6 +34,14 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "RUF"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.13"
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
+reportMissingTypeStubs = "none"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
