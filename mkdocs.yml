@@ -1,0 +1,31 @@
+site_name: weirding
+site_description: XML ↔ Pydantic v2 conversion for structured AI output workflows
+repo_url: https://github.com/yogs0ddhoth/weirding
+
+theme:
+  name: material
+  font: false
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            docstring_style: google
+
+nav:
+  - Getting Started: index.md
+  - API Reference: api.md
+  - Architecture Decisions: adr/README.md

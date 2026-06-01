@@ -1,19 +1,38 @@
 # Changelog
 
-Template release notes. Each entry describes what changed in the template itself — new
-skills, updated hooks, structural improvements — so initialized projects can evaluate
-whether to pull in a version upgrade.
+All notable changes to weirding are documented here.
 
-Initialized projects: clear this file and start your own changelog from scratch. Write in
-user-facing language ("you can now X"), not developer language ("we refactored Y"). Use
-the `/changelog` command to generate entries from commits.
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
-_No changes yet._
+### Changed
+- ruff D rules with Google docstring convention now enforced across `src/`
+- `json-schema-to-pydantic` version pin tightened to `>=0.4.7,<1`
+
+### Added
+- Coverage threshold: 90% minimum enforced in CI (`--cov-fail-under=90`)
+- Nine project standards codified: async policy, logging policy, dependency pinning strategy,
+  `JsonSchemaIR` semver contract, docstring convention, parametrize policy, PBT file
+  separation, `PydanticBuilder` placement, and coverage threshold
 
 ## [0.1.0] — 2026-04-30
 
-Initial template release. Includes full skill set, agent definitions, hooks, and the
-universal/project layer split with `TEMPLATE_VERSION` and `TEMPLATE.md` for version
-tracking and upgrade guidance.
+### Added
+- `compile(xml)` — XML schema → JSON Schema IR dict (plain-attribute annotation dialect)
+- `define_model(xml)` — XML schema → Pydantic v2 BaseModel (convenience wrapper)
+- `from_schema(ir, *, name, builder)` — JSON Schema IR → Pydantic model (direct IR path)
+- `parse(xml, model)` — XML data → validated Pydantic instance
+- `to_xml(instance)` — Pydantic instance → XML string (full round-trip)
+- `prompt.to_template(model)` — Pydantic model → XML prompt template for LLM structured output
+- `prompt.format_error(error, model)` — ValidationError → human-readable retry message (PII never echoed)
+- `prompt.RetryContext` — stateful retry loop helper for LLM → parse → retry workflows
+- `DTOBuilder` Protocol — extensible model-building backend abstraction
+- `PydanticBuilder` — default DTOBuilder backed by json-schema-to-pydantic
+- `Validatable` Protocol — validation backend abstraction for `parse()`
+- `JsonSchemaIR` TypeAlias — public type for the JSON Schema IR dict
+- `weirding[xsd]` optional extra — full XSD schema support via xmlschema bridge
+  - Dialect auto-detected from root element tag (`{http://www.w3.org/2001/XMLSchema}schema`)
+- Secure XML parsing: `resolve_entities=False`, `no_network=True`, `load_dtd=False`
+- XXE and billion-laughs attack prevention verified by security tests
