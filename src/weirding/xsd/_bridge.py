@@ -160,11 +160,13 @@ def _complex_type_to_ir(complex_type: Any) -> JsonSchemaIR:
     if content.model == "choice":
         return _choice_to_ir(content)
 
-    properties: dict = {}
+    properties: dict[str, JsonSchemaIR] = {}
     required: list[str] = []
 
     for elem_decl in _iter_elements(complex_type):
         field_name = elem_decl.local_name
+        if field_name is None:
+            continue
         field_ir = _elem_decl_to_ir(elem_decl)
 
         # xs:annotation/xs:documentation → description
@@ -183,10 +185,10 @@ def _complex_type_to_ir(complex_type: Any) -> JsonSchemaIR:
         properties[field_name] = field_ir
 
         min_occurs = getattr(elem_decl, "min_occurs", 1)
-        if min_occurs != 0 and field_name is not None:
+        if min_occurs != 0:
             required.append(field_name)
 
-    schema: dict = {"type": "object", "properties": properties}
+    schema: JsonSchemaIR = {"type": "object", "properties": properties}
     if required:
         schema["required"] = required
     return schema
@@ -204,7 +206,7 @@ def _elem_decl_to_ir(elem_decl: Any) -> JsonSchemaIR:
     # Array: maxOccurs > 1 or unbounded (None)
     if max_occurs is None or (isinstance(max_occurs, int) and max_occurs > 1):
         item_ir = _type_to_schema(xsd_type)
-        array_ir: dict = {
+        array_ir: JsonSchemaIR = {
             "type": "array",
             "items": item_ir,
             "x-weirding-item-tag": elem_decl.local_name,
