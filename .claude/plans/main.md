@@ -1,340 +1,422 @@
-# Plan: Phase 03 — XSD Support
+# Plan: Pre-Release Documentation and Test Quality
 
-**Branch to create before implementation:** `feat/phase-03-xsd-support`
-**Base:** `main` (current HEAD `3ae1c79`)
-**Planned by:** Claude Sonnet 4.6 on 2026-05-28
-
----
-
-## Context
-
-Phase 02 complete (105 tests). XSD support is pre-gated in `_schema.py`: when the root element
-tag is `{http://www.w3.org/2001/XMLSchema}schema`, it raises
-`UnsupportedDialectError("XSD support requires weirding[xsd]")`. The `[xsd]` extra is declared
-in `pyproject.toml` with an empty dependency list. Phase 03 fills in the bridge.
-
-No new public API is required: `compile()` already accepts XSD strings and auto-detects the
-dialect. The bridge wires into the existing detection point in `_schema.py`.
+**Branch:** main (create `docs/pre-release-docs-and-pbt` before implementing)
+**Phase context:** Phase 03 complete; Phase 04 (Distribution) in progress  
+**Created:** 2026-06-01  
+**Depends on:** `chore/pre-release-standards-hardening` merged to main first (adds ruff D rules, coverage threshold, 9 MEMORY.md standards)
 
 ---
 
-## Protected Files
+## Goal
 
-| File | Tier | Action |
-|------|------|--------|
-| `src/weirding/_parser.py` | Tier 1 | **NOT TOUCHED** |
-| `src/weirding/__init__.py` | Tier 1 | **NOT TOUCHED** — `compile()` public signature is unchanged |
-| `src/weirding/_schema.py` | Tier 2 | MODIFIED — replace 1-line `raise` with 5-line conditional bridge dispatch |
-| `src/weirding/_models.py` | Tier 2 | **NOT TOUCHED** |
+Deliver the documentation and test quality work identified in the ideation's Track 2:
+- Complete README Getting Started with a working, copy-paste example
+- Replace the Melange template CHANGELOG with weirding-specific release history
+- Set up MkDocs + Material documentation site (API reference + Getting Started)
+- Add Hypothesis property-based tests for IR well-formedness and round-trip identity
 
-**Tier 2 justification for `_schema.py`:** The existing `UnsupportedDialectError` guard must
-be replaced with a conditional import that calls the bridge when `xmlschema` is installed and
-falls back to the same error when it is not. This is the minimal surgical change: one `if`-block
-replaces one `raise` statement. All other logic in `compile_schema()` is unchanged.
+No protected files are touched. No behavior changes to library code.
 
 ---
 
 ## Simplicity Challenge
 
-**Simplest approach considered:** Inline the XSD → IR logic directly inside `_schema.py`'s
-`compile_schema()` function. No sub-package, no separate module.
+Could this be one phase? The docs setup (Phase 1) and the Hypothesis suite (Phase 2) are
+genuinely independent — each has its own completion signal, its own dependency additions, and
+its own test feedback loop. Merging them means a single agent session that mixes `mkdocs build`
+failures (docs tooling) with `pytest` failures (PBT strategy bugs). Keeping them separate is
+cleaner iteration.
 
-**Why the plan adds a sub-package instead:** `_schema.py` is Tier 2 protected; the review
-requirement is to minimize the diff. MEMORY.md pre-decides `src/weirding/xsd/` as the bridge
-location. XSD traversal is substantial enough to need independent testability. Isolating it in
-`src/weirding/xsd/_bridge.py` keeps the hot paths (native annotation vs XSD) independently
-testable without touching each other, and the diff to `_schema.py` is as small as possible.
+Could this be three phases? Splitting CHANGELOG out of Phase 1 would create a 5-minute commit
+with no build impact — unnecessary. CHANGELOG, README, and MkDocs all live in the same
+documentation pass and commit together naturally.
+
+---
+
+## Protected Files
+
+None. This plan creates new files and edits non-protected files only:
+- `pyproject.toml` — dependency additions (docs and hypothesis extras)
+- `CHANGELOG.md` — full replacement of template content
+- `README.md` — replace Getting Started placeholder with functional example
+- `mkdocs.yml` — new file (project root)
+- `docs/index.md` — new file
+- `docs/api.md` — new file
+- `tests/test_schema_pbt.py` — new file
+- `.hypothesis/` — new directory (committed, small)
 
 ---
 
 ## ADR Candidates
 
-1. **XSD library choice (ADR-0006):** `xmlschema` vs alternatives. No maintained Python runtime
-   XSD converter exists except `xmlschema`. Document the choice, dependency scope (optional
-   extra only, never base), and version floor rationale.
-2. **String-based XSD parsing (ADR-0006 or addendum):** How to pass in-memory XSD string to
-   `xmlschema.XMLSchema` without network/filesystem side effects. Using `io.StringIO` with
-   `defuse="all"` is the approach; needs a record because it has security and portability
-   implications for schemas using `xs:import`.
+**ADR required — MkDocs + Material toolchain (Phase 1):** Trade-off between MkDocs
+Material (markdown-native, fast) vs. Sphinx (RST-default, more extensible, larger ecosystem).
+Cross-component impact: adds new `[docs]` optional dep group, new root `mkdocs.yml` config,
+and a CI build step. Hard to reverse once a public docs URL is established. The implementing
+agent must author this ADR after `mkdocs build --strict` passes — do not defer to MEMORY.md.
 
 ---
 
-## Phase 03a — Foundation (pyproject + wiring + package scaffold)
+## Phase 1 — Documentation Site and CHANGELOG
 
-**Estimate:** 1–1.5h
+**Goal:** Complete the README Getting Started, replace the template CHANGELOG, configure
+MkDocs, and verify the docs site builds cleanly.
 
-### Files created
+**Files created:**
+- `mkdocs.yml` (project root)
+- `docs/index.md`
+- `docs/api.md`
 
-| File | Content |
-|------|---------|
-| `src/weirding/xsd/__init__.py` | Package marker; re-exports `xsd_to_ir` |
-| `src/weirding/xsd/_bridge.py` | `xsd_to_ir(xml: str \| bytes) -> dict` — full implementation (see spec below) |
+**Files modified:**
+- `pyproject.toml` — add `docs` optional-dependency group
+- `README.md` — replace Getting Started placeholder
+- `CHANGELOG.md` — full replacement of Melange template with weirding history
 
-### Files modified
+**Protected files:** none
 
-| File | Change |
-|------|--------|
-| `pyproject.toml` | Add `xmlschema>=3.0` to `[xsd]` extra; add `"weirding[xsd]"` to `dev` extra |
-| `CLAUDE.md` | Update Build command to `uv sync --extra dev` (dev already pulls xsd transitively) |
-| `src/weirding/_schema.py` (Tier 2) | Replace `raise UnsupportedDialectError(...)` with conditional bridge dispatch |
+### 1.1 — Add docs dependencies to `pyproject.toml`
 
-### `_schema.py` change (exact diff)
-
-Replace:
-```python
-if root.tag == _XSD_SCHEMA_TAG:
-    raise UnsupportedDialectError("XSD support requires weirding[xsd]")
+Add a `docs` optional-dependency group:
+```toml
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material>=9.7,<10",
+    "mkdocstrings[python]>=0.28",
+]
 ```
 
-With:
-```python
-if root.tag == _XSD_SCHEMA_TAG:
-    try:
-        from weirding.xsd._bridge import xsd_to_ir
-    except ImportError as exc:
-        raise UnsupportedDialectError("XSD support requires weirding[xsd]") from exc
-    return xsd_to_ir(root)
+Run `uv sync --extra docs` to verify resolution.
+
+### 1.2 — Create `mkdocs.yml`
+
+```yaml
+site_name: weirding
+site_description: XML ↔ Pydantic v2 conversion for structured AI output workflows
+repo_url: https://github.com/yogs0ddhoth/weirding
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            docstring_style: google
+
+nav:
+  - Getting Started: index.md
+  - API Reference: api.md
+  - Architecture Decisions: adr/README.md
 ```
 
-Note: pass the already-parsed `root` element (not the raw XML string) to avoid re-parsing.
-`xsd_to_ir` must accept either a raw XML string/bytes *or* an `lxml.etree._Element`.
+Note: `docs/planning/` is intentionally excluded from the nav (internal tool, not user-facing).
 
-### `_bridge.py` specification
+### 1.3 — Create `docs/index.md` (Getting Started)
 
+Write a complete, self-contained Getting Started guide covering:
+
+1. **Installation** — `pip install weirding` and `pip install weirding[xsd]`
+2. **Core workflow** — `compile()`, `define_model()`, `parse()`, `to_xml()` with working examples
+3. **LLM retry workflow** — `RetryContext` + `to_template()` + `format_error()` with a realistic example
+
+The example must be copy-paste runnable with no external dependencies beyond `weirding` itself.
+
+Example structure for the core workflow section:
 ```python
-def xsd_to_ir(source: str | bytes | etree._Element) -> dict:
-    """Convert an XSD document to a JSON Schema IR dict.
+import weirding
 
-    Accepts a raw XSD string/bytes or an already-parsed lxml Element (root
-    <xs:schema> element). When a string/bytes is passed it is parsed via
-    weirding._parser.make_parser() before being handed to xmlschema.
-    """
+# Define a schema as annotated XML
+schema_xml = """
+<Response>
+  <name type="string" required="true" description="The person's full name"/>
+  <age type="integer" required="true" minimum="0"/>
+  <bio type="string" required="false"/>
+</Response>
+"""
+
+# Compile to JSON Schema IR (publicly exposed, cacheable)
+ir = weirding.compile(schema_xml)
+
+# Build a Pydantic model
+Model = weirding.define_model(schema_xml)
+
+# Parse XML (e.g., from an LLM response)
+instance = weirding.parse("""
+<Response>
+  <name>Alice Smith</name>
+  <age>30</age>
+</Response>
+""", Model)
+
+# Round-trip back to XML
+xml_string = weirding.to_xml(instance)
+
+# Generate a prompt template for the schema
+template = weirding.prompt.to_template(Model)
 ```
 
-**Entry points:**
+### 1.4 — Create `docs/api.md` (API Reference)
 
-`xsd_to_ir` has a single public signature: `xsd_to_ir(source: etree._Element) -> dict`.
-It accepts only an already-parsed lxml element (as passed from `_schema.py`).
+Use mkdocstrings `:::` directives to generate API reference from docstrings:
 
-A private `_xsd_to_ir_from_bytes(xml_bytes: bytes) -> dict` helper exists for standalone
-test use only. It is NOT called from `_schema.py` and is NOT exported from `__init__.py`.
+```markdown
+# API Reference
 
-**`xmlschema` instantiation (security posture):**
-```python
-import xmlschema
+## Core pipeline
 
-def _build_xs_schema(root: etree._Element) -> xmlschema.XMLSchema:
-    return xmlschema.XMLSchema(root, defuse="always")
+::: weirding
+    options:
+      members:
+        - compile
+        - define_model
+        - from_schema
+        - parse
+        - to_xml
+
+## Prompt utilities
+
+::: weirding.prompt
+    options:
+      members:
+        - to_template
+        - format_error
+        - RetryContext
+
+## Protocols and types
+
+::: weirding
+    options:
+      members:
+        - JsonSchemaIR
+        - DTOBuilder
+        - PydanticBuilder
+        - Validatable
+
+## Exceptions
+
+::: weirding
+    options:
+      members:
+        - WeirdingError
+        - SchemaError
+        - ParseError
+        - UnsupportedDialectError
 ```
 
-`defuse="always"` prevents entity expansion. Do NOT use `defuse="remote"` (default) — our
-threat model prohibits network side-effects entirely. Defense-in-depth: lxml's
-`make_parser()` already defuses the element before it reaches `xsd_to_ir`, so `defuse="always"`
-is a second layer.
+### 1.5 — Update `README.md` Getting Started
 
-**Root element selection:** Use the first element declaration in `xs_schema.elements`. If
-`xs_schema.elements` is empty, raise `SchemaError("XSD has no top-level element declarations")`.
+Replace the `_Getting Started instructions coming soon._` placeholder with a short
+functional example (3–5 lines: install, `compile`, `define_model`, `parse`). The README is
+the PyPI first-contact surface — keep it concise. Direct readers to the docs site for the
+full guide.
 
-**Title:** local name of the root element declaration.
+### 1.6 — Replace `CHANGELOG.md`
 
-**Type mapping table (`_XSD_TYPE_MAP`):**
+Clear the Melange template content entirely. Write weirding-specific release history based
+on the commit log (`git log --oneline`). Use Keep a Changelog format:
 
-Keys are Clark-notation URIs (`t.name`), not prefixed names (`t.prefixed_name`). The prefix (`xs:`) is schema-local and not reliable. Lookup via `_XSD_TYPE_MAP.get(type_obj.name, {"type": "string"})`.
+```markdown
+# Changelog
 
-| Clark-form key | JSON Schema |
-|----------------|-------------|
-| `{http://www.w3.org/2001/XMLSchema}string`, `normalizedString`, `token`, `anyURI`, `ID`, `IDREF`, `Name`, `NCName`, `NMTOKEN` | `{"type": "string"}` |
-| `{http://www.w3.org/2001/XMLSchema}integer`, `int`, `long`, `short`, `byte`, `nonNegativeInteger`, `positiveInteger`, `unsignedInt`, `unsignedLong`, `unsignedShort`, `unsignedByte` | `{"type": "integer"}` |
-| `{http://www.w3.org/2001/XMLSchema}decimal`, `float`, `double` | `{"type": "number"}` |
-| `{http://www.w3.org/2001/XMLSchema}boolean` | `{"type": "boolean"}` |
-| `{http://www.w3.org/2001/XMLSchema}date` | `{"type": "string", "format": "date"}` |
-| `{http://www.w3.org/2001/XMLSchema}time` | `{"type": "string", "format": "time"}` |
-| `{http://www.w3.org/2001/XMLSchema}dateTime` | `{"type": "string", "format": "date-time"}` |
-| All others (duration, gYear, gMonth, gDay, hexBinary, base64Binary, etc.) | `{"type": "string"}` |
+All notable changes to weirding will be documented here.
 
-(In code: keys can be generated as `f"{{http://www.w3.org/2001/XMLSchema}}{local}"` for each local name.)
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+
+## [Unreleased]
+
+### Added
+- ruff D rules with Google docstring convention enforced across src/
+- Coverage threshold (--cov-fail-under=90) gated in CI
+- json-schema-to-pydantic pin tightened to >=0.4.7,<1
+- 9 confirmed standards added to project memory (async policy, logging policy,
+  IR semver contract, PBT file separation, dependency pinning strategy, and more)
+
+## [0.1.0] — 2026-04-30
+
+### Added
+- `compile(xml)` — XML schema → JSON Schema IR dict (plain-attribute annotation dialect)
+- `define_model(xml)` — XML schema → Pydantic v2 BaseModel (convenience wrapper)
+- `from_schema(ir, name, builder)` — JSON Schema IR → Pydantic model (direct IR path)
+- `parse(xml, model)` — XML data → validated Pydantic instance
+- `to_xml(instance)` — Pydantic instance → XML string (round-trip serialization)
+- `prompt.to_template(model)` — Pydantic model → XML prompt template for LLM structured output
+- `prompt.format_error(error, model)` — ValidationError → human-readable retry message (no PII echoed)
+- `prompt.RetryContext` — stateful retry loop helper for LLM workflows
+- `DTOBuilder` Protocol — extensible model-building backend interface
+- `PydanticBuilder` — default DTOBuilder backed by json-schema-to-pydantic
+- `Validatable` Protocol — validation backend abstraction for parse()
+- `JsonSchemaIR` — public TypeAlias for the JSON Schema IR dict
+- `weirding[xsd]` optional extra — XSD schema support via xmlschema bridge
+- XSD dialect auto-detected from root element tag
+- Secure XML parsing (resolve_entities=False, no_network=True, load_dtd=False)
+- XXE and billion-laughs attack prevention verified by security tests
+```
+
+Populate the [Unreleased] section from the `chore/pre-release-standards-hardening` commits
+(the hardening work will land before this PR merges).
+
+### 1.7 — Build and verify docs site
+
+Run `uv run mkdocs build --strict` (the `--strict` flag treats warnings as errors, consistent
+with the zero-warning policy). If the build emits warnings about unresolved references or
+missing members, fix them.
 
 **Completion signal:**
-```
-uv run pytest tests/test_xsd.py -k "flat or title or missing_extra" -v   # pass
-uv run ruff check .                                                         # clean
-```
+- `uv run mkdocs build --strict` exits 0
+- `uv run ruff check . && uv run pyright && uv run pytest` all exit 0
+
+**Commit:** `docs(site): add MkDocs site, Getting Started, API reference, and weirding CHANGELOG`
+
+**Estimate:** 2–2.5 hours
 
 ---
 
-## Phase 03b — Complex types + optional fields + nillable
+## Phase 2 — Hypothesis Property-Based Tests
 
-**Estimate:** 2–3h
+**Goal:** Add a Hypothesis test suite covering IR structural well-formedness and
+the round-trip identity property.
 
-### Files modified
+**Files created:**
+- `tests/test_schema_pbt.py`
+- `.hypothesis/` directory (committed; empty initially, populated after first run)
 
-| File | Change |
-|------|--------|
-| `src/weirding/xsd/_bridge.py` | Implement `_complex_type_to_ir()`, optional element handling, nullable (`nillable`) |
+**Files modified:**
+- `pyproject.toml` — add `hypothesis` to `dev` optional deps, add `[tool.hypothesis]` section
 
-### Specification
+**Protected files:** none
 
-**`simpleContent` guard (required — blocking correctness):**
+### 2.1 — Add hypothesis dependency
 
-Before iterating a complex type's content, guard against `xs:simpleContent`:
-```python
-from xmlschema.validators import XsdGroup
-
-def _iter_elements(complex_type):
-    content = getattr(complex_type, "content", None)
-    if not isinstance(content, XsdGroup):
-        return  # xs:simpleContent — scalar type, not iterable
-    yield from content
+In `pyproject.toml`, add `hypothesis>=6.100` to the `dev` extra:
+```toml
+dev = [
+    "pytest>=8.0",
+    "pytest-cov",
+    "hypothesis>=6.100",
+    "ruff>=0.15.15",
+    "lxml-stubs>=0.5",
+    "weirding[xsd]",
+    "pyright>=1.1.390,<2",
+]
 ```
 
-When `content` is not an `XsdGroup` (e.g. `xs:simpleContent` extending a scalar type),
-the element's type is treated as a scalar — fall back to `_xsd_type_to_ir(elem_decl.type)`
-rather than iterating. Without this guard, `xs:simpleContent` raises `TypeError`.
-
-**Complex type traversal (after guard):**
-
-```
-for elem_decl in _iter_elements(complex_type):
-    field_name = elem_decl.local_name
-    min_occurs = elem_decl.min_occurs  # 0 → optional
-    max_occurs = elem_decl.max_occurs  # None → unbounded
-    nillable   = elem_decl.nillable    # bool
-    field_ir   = _elem_decl_to_ir(elem_decl)
-    properties[field_name] = field_ir
-    if min_occurs != 0:
-        required.append(field_name)
+Add `[tool.hypothesis]` section:
+```toml
+[tool.hypothesis]
+# Hypothesis auto-detects the CI env var — no explicit profile config needed here.
+# Per-profile settings (if needed) belong in conftest.py, not pyproject.toml.
 ```
 
-For `xs:choice`, emit a `oneOf` with each branch as a separate object schema
-(see Known Limitations below for partial support).
+Note: `deriving = ["ci"]` is NOT a valid Hypothesis TOML key and will cause a startup
+warning/error. Hypothesis detects `CI=true` automatically and applies conservative settings.
+No additional TOML configuration is required.
 
-**Nillable (`nillable="true"`):** wrap the element's IR in an anyOf null-union, matching
-the same `_wrap_nullable()` pattern from `_schema.py`:
-```python
-if nillable:
-    ir = {"anyOf": [ir, {"type": "null"}]}
+Run `uv sync --extra dev` to verify.
+
+### 2.2 — Create `tests/test_schema_pbt.py`
+
+Implement two property families per the MEMORY.md PBT standard and the ideation research:
+
+**Property 1 — IR structural well-formedness**
+
+For any valid weirding-annotation XML tree, `compile()` must return an IR dict that:
+- Has `"type": "object"` at root
+- Has `"title"` equal to the root tag name
+- Has `"properties"` (a dict) and `"required"` (a list)
+- Never contains `"prefixItems"` anywhere (MEMORY.md rule 11)
+
+Strategy: `xml_schema_tree()` drawing from the attribute vocabulary (type from
+`["string", "integer", "number", "boolean"]`, optional `required="false"`, basic
+constraints). Keep nesting depth at 0 (flat schema) for this property — recursive schemas
+are deferred to a post-v0.1 expansion.
+
+**Tag name constraint (required):** XML element names must be legal NCNames — they cannot
+start with a digit or contain spaces/metacharacters. Use
+`st.from_regex(r'[A-Za-z_][A-Za-z0-9_]{0,19}', fullmatch=True)` for all element tag names
+(both root tag and field names). Unrestricted `st.text()` will produce
+`lxml.etree.XMLSyntaxError` at strategy time rather than a test failure, violating the
+zero-warning policy.
+
+Settings: `@settings(max_examples=100, suppress_health_check=[HealthCheck.too_slow])`
+
+**Property 2 — Round-trip identity**
+
+For any schema that compiles without error and produces a model, and any valid data instance
+for that schema: `parse(to_xml(instance), Model).model_dump() == instance.model_dump()`.
+
+Strategy: `schema_and_valid_data()` — a composite strategy that generates both schema XML
+and a valid data XML in the same `draw()` call, ensuring the data is always type-consistent
+with the schema. This avoids the `hypothesis-jsonschema` compatibility concern (noted in
+ideation research) by keeping data generation entirely in-process.
+
+Data generation rules:
+- `type="string"` fields: `st.text(alphabet=st.characters(whitelist_categories=['L', 'N', 'Zs']), max_size=20)`
+- `type="integer"` fields: `st.integers(min_value=0, max_value=10000)`
+- `type="number"` fields: `st.floats(min_value=0, max_value=10000, allow_nan=False, allow_infinity=False)`
+- `type="boolean"` fields: `st.booleans()` → `"true"` / `"false"` text content
+- All required fields (no `required="false"`) are always included in data
+
+Settings: `@settings(max_examples=30, suppress_health_check=[HealthCheck.too_slow])`
+
+### 2.3 — Commit `.hypothesis/` directory
+
+After a successful `uv run pytest tests/test_schema_pbt.py` run, the `.hypothesis/` directory
+is populated with a database of examples (typically <5 KB). Commit it:
+```
+git add .hypothesis/
 ```
 
-**`xs:annotation` / `xs:documentation`:** if present on an element declaration, populate
-`"description"` in the field's IR dict.
+Per the MEMORY.md PBT standard, committing `.hypothesis/` enables CI to replay shrunk
+failures that were found locally without needing to rediscover them.
 
-**`additionalProperties` / `extra="forbid"` behavior:**
+Add `.hypothesis/` to the `.gitignore` exclusion list if it's already there; remove the
+exclusion so the directory is tracked.
 
-XSD has no `additionalProperties` concept. The XSD bridge never emits
-`"additionalProperties": false` in its IR. Therefore the `build_model()` `extra="forbid"`
-patch (MEMORY.md rule 12) will NOT fire for XSD-derived models. This is correct and
-intentional — XSD-derived Pydantic models use the default `extra="ignore"` behavior.
+### 2.4 — Verify no regressions
+
+Run `uv run pytest` (full suite, including new PBT tests). Report:
+- Total tests passing (should be 137 deterministic + new PBT tests)
+- Coverage (should remain ≥90%)
 
 **Completion signal:**
-```
-uv run pytest tests/test_xsd.py -k "not array and not enum" -v   # pass
-uv run ruff check .                                                 # clean
-```
+- `uv run pytest` exits 0
+- `uv run ruff check . && uv run pyright` exit 0
+- PBT tests complete within a reasonable time (under 60 seconds on warm Hypothesis DB)
+
+**Commit:** `test(pbt): add Hypothesis property tests for IR well-formedness and round-trip identity`
+
+**Estimate:** 2 hours
 
 ---
 
-## Phase 03c — Array fields + enumerations + integration
-
-**Estimate:** 1.5–2h
-
-### Files modified
-
-| File | Change |
-|------|--------|
-| `src/weirding/xsd/_bridge.py` | Add array handling (`maxOccurs > 1`), enum handling (`xs:restriction` + `xs:enumeration`) |
-| `tests/test_xsd.py` | Add array tests, enum tests, end-to-end integration tests |
-
-### Array field specification
-
-When `max_occurs is None` (unbounded) or `max_occurs > 1`:
-
-```python
-item_ir = _elem_decl_to_ir(elem_decl, as_item=True)  # strip array wrapper recursion guard
-field_ir = {
-    "type": "array",
-    "items": item_ir,
-    "x-weirding-item-tag": elem_decl.local_name,
-}
-if elem_decl.min_occurs is not None and elem_decl.min_occurs > 0:
-    field_ir["minItems"] = elem_decl.min_occurs
-if elem_decl.max_occurs is not None:
-    field_ir["maxItems"] = elem_decl.max_occurs
-```
-
-The wrapper element's local name becomes both the field name in the parent object AND
-`x-weirding-item-tag` (same element is repeated, consistent with native-annotation convention).
-
-### Enum field specification
-
-A simple type with `xs:restriction` + `xs:enumeration` facets maps to JSON Schema `enum`:
-
-```python
-if hasattr(type_obj, "enumeration") and type_obj.enumeration:
-    base_ir = _xsd_type_to_ir(type_obj.base_type)  # get the base type dict
-    return {**base_ir, "enum": list(type_obj.enumeration)}
-```
-
-Values are taken directly (strings if base is string, ints if base is integer, etc.).
-
-### Integration test specification
-
-```python
-@pytest.mark.parametrize("xsd_fixture,expected_title,field_checks", [...])
-def test_compile_define_parse_round_trip(xsd_fixture, expected_title, field_checks):
-    ir = compile(xsd_fixture)
-    assert ir["title"] == expected_title
-    Model = from_schema(ir, name=expected_title)
-    instance = parse(sample_xml_for(xsd_fixture), Model)
-    assert to_xml(instance)  # no exception; round-trip completes
-```
-
-Cover at minimum:
-1. Flat XSD → compile → from_schema → parse → to_xml
-2. Nested complex type XSD
-3. Array field XSD
-
-### Files modified (docs + memory)
-
-| File | Change |
-|------|--------|
-| `docs/planning/PROJECT_ROADMAP.md` | Phase 03 → ✅ complete |
-| `.claude/memory/MEMORY.md` | Advance current phase to 04; record `xmlschema>=3.0` as `[xsd]` dep; record `defuse="always"` posture |
-
-**Completion signal:**
-```
-uv run pytest                    # all tests pass (105 + new XSD suite)
-uv run ruff check .              # zero warnings
-uv run ruff format . --check     # no diffs
-```
-
----
-
-## Known Limitations (document in module docstring, not blocking Phase 03)
-
-- `xs:choice` model groups: partially supported (each alternative becomes a separate
-  `oneOf` branch). Complex nested choices may not round-trip correctly via `parse()`.
-- `xs:extension` / `xs:restriction` on complex content (inheritance): not supported.
-  Elements using inheritance will produce incomplete property sets.
-- `xs:import` / `xs:include`: `defuse="always"` blocks network resolution. Local
-  `xs:include` via relative path will fail (by design — we receive XSD as an in-memory
-  string, not a file path).
-- Multiple top-level element declarations: only the first is used as the root. Future
-  API enhancement (`compile(xsd, root="ElementName")`) deferred to Phase 04+.
-
----
-
-## Total Estimate: 5–7h
+## Total Estimate: ~4.5 hours
 
 ---
 
 ## Post-Completion Checklist
 
-- [ ] `uv run pytest` — all tests pass
-- [ ] `uv run ruff check .` — zero warnings
-- [ ] `uv run ruff format . --check` — no diffs
-- [ ] Update `.claude/memory/MEMORY.md` — mark Phase 03 complete, advance to Phase 04
-- [ ] Update `docs/planning/PROJECT_ROADMAP.md` — Phase 03 status to ✅
-- [ ] ADR-0006 authored for XSD library choice and string-parsing posture
-- [ ] Conventional commit: `feat(xsd): implement XSD → JSON Schema IR bridge (weirding[xsd])`
-- [ ] Co-authorship trailers for Ben Lin and Claude Sonnet 4.6
-- [ ] PR against `main`
+- [ ] `uv run mkdocs build --strict` — site builds cleanly
+- [ ] `uv run ruff check .` — zero violations
+- [ ] `uv run pyright` — zero errors
+- [ ] `uv run pytest --cov=weirding` — all tests pass, coverage ≥90%
+- [ ] `CHANGELOG.md` contains weirding history (not Melange template)
+- [ ] `README.md` Getting Started section is functional (not a placeholder)
+- [ ] `docs/index.md` and `docs/api.md` exist
+- [ ] `tests/test_schema_pbt.py` contains both property families
+- [ ] `.hypothesis/` committed
+- [ ] `docs/planning/` excluded from MkDocs nav (internal only)
+- [ ] PR against `main` (depends on `chore/pre-release-standards-hardening` landing first)

@@ -1,4 +1,0 @@
-# file: C:\Users\becom\Developer\weirding\.claude\worktrees\agent-afc6c3ab67a5d3e57\src\weirding\xsd\_bridge.py
-# hypothesis_version: 6.155.1
-
-['ID', 'IDREF', 'NCName', 'NMTOKEN', 'Name', 'always', 'annotation', 'anyOf', 'anyURI', 'array', 'base64Binary', 'base_type', 'boolean', 'byte', 'choice', 'content', 'date', 'date-time', 'dateTime', 'decimal', 'description', 'documentation', 'double', 'duration', 'enum', 'enumeration', 'float', 'format', 'gDay', 'gMonth', 'gYear', 'hexBinary', 'int', 'integer', 'items', 'long', 'maxItems', 'max_occurs', 'minItems', 'min_occurs', 'name', 'nillable', 'nonNegativeInteger', 'normalizedString', 'null', 'number', 'object', 'oneOf', 'positiveInteger', 'properties', 'required', 'short', 'string', 'time', 'title', 'token', 'type', 'unsignedByte', 'unsignedInt', 'unsignedLong', 'unsignedShort', 'x-weirding-item-tag']
