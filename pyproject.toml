@@ -16,14 +16,23 @@ dependencies = [
 
 [project.optional-dependencies]
 xsd = ["xmlschema>=3.0"]
+docs = [
+    "mkdocs-material>=9.7,<10",
+    "mkdocstrings[python]>=0.28",
+]
 dev = [
     "pytest>=8.0",
     "pytest-cov",
+    "hypothesis>=6.100",
     "ruff>=0.15.15",
     "lxml-stubs>=0.5",
     "weirding[xsd]",
     "pyright>=1.1.390,<2",
 ]
+
+[tool.hypothesis]
+# Hypothesis auto-detects CI=true environment variable automatically.
+# No explicit profile configuration required here.
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/weirding"]
@@ -52,3 +61,4 @@ reportMissingTypeStubs = "none"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--strict-markers", "--strict-config", "--cov=weirding", "--cov-report=term-missing", "--cov-fail-under=90"]
+markers = ["pbt: property-based tests (run with hypothesis; exclude with -k 'not pbt')"]

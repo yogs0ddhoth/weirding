@@ -6,7 +6,24 @@ weirding is a production-grade Python library for XML ↔ Pydantic v2 conversion
 
 ## Getting Started
 
-_Getting Started instructions coming soon._
+```bash
+pip install weirding
+```
+
+```python
+import weirding
+
+Model = weirding.define_model("""
+<Response>
+  <name type="string" required="true"/>
+  <score type="integer" required="true"/>
+</Response>
+""")
+
+instance = weirding.parse("<Response><name>Alice</name><score>42</score></Response>", Model)
+```
+
+See the [documentation](https://yogs0ddhoth.github.io/weirding/) for the full guide including XSD support and LLM retry workflows.
 
 ---
 
