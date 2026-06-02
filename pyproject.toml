@@ -8,6 +8,20 @@ version = "0.1.0"
 description = "XML ↔ Pydantic v2 conversion for structured AI output workflows"
 requires-python = ">=3.11"
 license = { text = "MIT" }
+readme = "README.md"
+authors = [{ name = "Ben Lin", email = "blin7.webdev@gmail.com" }]
+keywords = ["xml", "pydantic", "llm", "structured-output", "ai", "claude", "xsd"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup :: XML",
+]
 dependencies = [
     "pydantic>=2.13.4",
     "lxml>=6.1.1",
@@ -29,6 +43,12 @@ dev = [
     "weirding[xsd]",
     "pyright>=1.1.390,<2",
 ]
+
+[project.urls]
+Homepage = "https://github.com/yogs0ddhoth/weirding"
+Documentation = "https://yogs0ddhoth.github.io/weirding/"
+Repository = "https://github.com/yogs0ddhoth/weirding"
+Changelog = "https://github.com/yogs0ddhoth/weirding/blob/main/CHANGELOG.md"
 
 [tool.hypothesis]
 # Hypothesis auto-detects CI=true environment variable automatically.
