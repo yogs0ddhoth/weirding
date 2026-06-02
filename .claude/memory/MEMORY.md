@@ -8,7 +8,7 @@ future agent would need to avoid re-litigating.
 ## Core Facts
 
 - **Language / Stack:** Python 3.11+, pydantic>=2.0, lxml>=4.9.2, json-schema-to-pydantic>=0.4, uv
-- **Current phase:** Phase 03 — XSD Support (complete); next: Phase 04 — Distribution
+- **Current phase:** Phase 04 — Distribution (complete); pending: v0.1.0 tag + PyPI release (see ADR-0009 for publish setup)
 - **Framework version:** 0.3.0
 - **Roadmap:** `docs/planning/PROJECT_ROADMAP.md`
 - **ADRs:** `docs/adr/` — read before touching any component
