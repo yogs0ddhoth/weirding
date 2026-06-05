@@ -2,8 +2,12 @@
 
 weirding is a production-grade Python library for XML ↔ Pydantic v2 conversion. It compiles
 XML schema documents into Pydantic v2 `BaseModel` classes, validates XML data against those
-models, and serializes instances back to XML — purpose-built for the Claude structured output
-workflow.
+models, and serializes instances back to XML. The XML schema you author once is a single
+source of truth with first-class structured-output interop across the ecosystem — export
+provider-ready schemas with `to_json_schema()` for OpenAI/Azure, Databricks `ai_query`, and
+open-weight runtimes (vLLM/Ollama); drop generated models straight into LangChain/LangGraph;
+and drive any provider's retry loop with the prompt utilities, Claude included. See the
+[integration guides](integrations/langchain.md) for end-to-end recipes.
 
 ---
 
@@ -91,9 +95,10 @@ instance = weirding.parse("<Person><name>Bob</name><age>25</age></Person>", Mode
 
 ## LLM retry workflow
 
-weirding ships prompt engineering utilities designed for the Claude structured output
-workflow. `prompt.to_template()` turns a model into an XML prompt template, and
-`prompt.RetryContext` manages the retry loop when the model returns invalid XML.
+weirding ships provider-neutral prompt engineering utilities for structured-output retry
+loops — they make no API calls and work with any provider (Claude, OpenAI, open-weight, …).
+`prompt.to_template()` turns a model into an XML prompt template, and `prompt.RetryContext`
+manages the retry loop when the model returns invalid XML.
 
 ```python
 import weirding
@@ -119,17 +124,22 @@ Respond using this XML format exactly:
 {template}"""
 
 # Retry loop — wraps the LLM call, parse, and error formatting
-ctx = prompt.RetryContext(model=Model, max_retries=3)
+ctx = prompt.RetryContext(Model, max_attempts=3)
 
-while ctx.should_retry():
-    llm_response = call_your_llm(system_prompt, ctx.user_message())
+result = None
+while not ctx.exceeded:
+    user_message = "Extract entities from: ..."
+    if ctx.attempt:
+        # retry_message() is built from format_error() — safe to send back to the
+        # model: no raw user data or PII is echoed (include_input=False)
+        user_message += "\n\n" + ctx.retry_message()
+    llm_response = call_your_llm(system_prompt, user_message)
     try:
         result = weirding.parse(llm_response, Model)
         break  # success
     except weirding.ParseError as exc:
-        # format_error returns a human-readable message safe to send back to the LLM
-        # (no raw user data or PII is echoed)
-        ctx.record_failure(prompt.format_error(exc, Model))
+        ctx.record_error(exc)
 ```
 
-See the [API Reference](api.md) for full parameter documentation.
+See the [API Reference](api.md) for full parameter documentation, and the
+[integration guides](integrations/langchain.md) for provider-specific recipes.

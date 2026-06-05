@@ -28,4 +28,9 @@ plugins:
 nav:
   - Getting Started: index.md
   - API Reference: api.md
+  - Integrations:
+      - LangChain & LangGraph: integrations/langchain.md
+      - OpenAI & Azure: integrations/openai-azure.md
+      - Open-weight (vLLM/Ollama): integrations/open-weight.md
+      - Databricks & PySpark: integrations/databricks-pyspark.md
   - Architecture Decisions: adr/README.md

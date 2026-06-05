@@ -8,7 +8,7 @@ future agent would need to avoid re-litigating.
 ## Core Facts
 
 - **Language / Stack:** Python 3.11+, pydantic>=2.0, lxml>=4.9.2, json-schema-to-pydantic>=0.4, uv
-- **Current phase:** Phase 04 — Distribution (complete); pending: v0.1.0 tag + PyPI release (see ADR-0009 for publish setup)
+- **Current phase:** Phase 05 — Ecosystem Interop (in progress on `feat/phase-05-ecosystem-interop`); 0.1.0 shipped (PR #5 merged, docs live). Phase 04 — Distribution complete.
 - **Framework version:** 0.3.0
 - **Roadmap:** `docs/planning/PROJECT_ROADMAP.md`
 - **ADRs:** `docs/adr/` — read before touching any component
@@ -79,6 +79,10 @@ agents. Never run verbose or iterative commands in the main session.
   existing keys are breaking changes (semver **major**). Additions of new optional keys
   (including new `x-weirding-*` extension keys) are **minor**. Applies regardless of whether
   the change also modifies a Python function signature. Recorded in ADR-0002 appendix.
+
+- **Schema-export helper (`to_json_schema`)** (added 2026-06-05, ADR-0010): `weirding.to_json_schema(ir, *, strict=False) -> dict` in `src/weirding/_export.py`, exported from `__all__`. Pure boundary transform of the public IR — deep-copies, no mutation/IO/logging. `strict=False` strips only `x-weirding-*` (clean draft 2020-12 for vLLM/Ollama/jsonschema). `strict=True` emits the **OpenAI ∩ Databricks intersection**: `additionalProperties:false` + all-`required` on every object, collapse nullable `anyOf:[T,null]` → `{"type":[T,"null"]}`, inline local `#/$defs/` `$ref` (drop `$defs`), strip unsupported keywords (`_STRIP_KEYWORDS`), raise `SchemaError` on non-null `anyOf`/`oneOf`/`allOf`, non-local/unresolvable `$ref`, nullable root, or >64 total keys. **`format`/`minimum`/`maximum` are stripped conservatively (Databricks support undocumented) — do NOT re-add without confirming Databricks acceptance.** Reuses existing `SchemaError`; no new exception type. Adding it is semver-minor.
+
+- **First-class documented integration targets** (Phase 05, 2026-06-05): LangChain/LangGraph, OpenAI/Azure, open-weight (vLLM/Ollama), and Databricks/PySpark each have a runnable guide under `docs/integrations/` (linked from `mkdocs.yml` nav). Positioning is ecosystem-neutral — Claude is one peer, not the sole target. No provider abstraction or runtime dep was added; the guides compose the existing public API (`to_json_schema`, `define_model`, `parse`, `prompt.*`). Databricks UDF guidance: build the dynamic model inside the partition closure (class is not picklable by name), cap retries hard (speculative exec duplicates), delegate `StructType` to `sparkdantic`, and log counts only — never row inputs/responses/`format_error` output (rule 2).
 
 - **Async policy:** weirding is synchronous by design (`lxml` is synchronous; no async
   needed for 1–50KB AI payloads). No async support until a concrete streaming use case is

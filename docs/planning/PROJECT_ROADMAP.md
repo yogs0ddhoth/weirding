@@ -9,12 +9,13 @@ Current development status. Update after each phase is started or completed.
 | ✅ | 02 | Prompt Utilities — `prompt.to_template()`, `prompt.format_error()`, `RetryContext` | 105 tests |
 | ✅ | 03 | XSD Support — `weirding[xsd]` extra, `xmlschema`-based IR bridge, dialect auto-detection | 132 tests |
 | ✅ | 04 | Distribution — pyproject.toml finalization, CI/CD pipeline, PyPI release, public documentation | ADR-0009 |
+| 🚧 | 05 | Ecosystem Interop — `to_json_schema()` provider-ready schema export, model `description`→`__doc__` propagation, integration docs (LangChain/LangGraph, OpenAI/Azure, vLLM/Ollama, Databricks/PySpark), ecosystem-neutral repositioning | ADR-0010, ADR-0011 |
 
-**Status key:** Complete · In Progress · Planned
+**Status key:** ✅ Complete · 🚧 In Progress · 📋 Planned
 
 ## Current Focus
 
-Ready for v0.1.0 tag and PyPI release (see manual setup steps in `feat/phase-04-distribution` PR)
+Phase 05 — Ecosystem Interop: code seams (`to_json_schema`, `__doc__` propagation) complete; integration docs and repositioning in progress on `feat/phase-05-ecosystem-interop`.
 
 ## Recently Completed
 

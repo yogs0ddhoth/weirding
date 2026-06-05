@@ -6,7 +6,7 @@
 
 ## Project
 
-weirding is a production-grade Python library for XML ↔ Pydantic v2 conversion. It provides `compile(xml)` to convert XML schema documents — using a plain-attribute annotation convention or XSD — into a JSON Schema IR dict, `define_model(xml)` to compile that IR into Pydantic v2 `BaseModel` classes, `parse(xml, model)` to validate and bind XML data against those models, and `to_xml(instance)` for round-trip serialization. Includes prompt engineering utilities (`prompt.to_template()`, `prompt.format_error()`, `RetryContext`) purpose-built for the Claude structured output workflow. Designed for Databricks, Kubernetes, serverless, and edge environments.
+weirding is a production-grade Python library for XML ↔ Pydantic v2 conversion. It provides `compile(xml)` to convert XML schema documents — using a plain-attribute annotation convention or XSD — into a JSON Schema IR dict, `define_model(xml)` to compile that IR into Pydantic v2 `BaseModel` classes, `parse(xml, model)` to validate and bind XML data against those models, and `to_xml(instance)` for round-trip serialization. The XML schema you author once becomes a single source of truth with first-class structured-output interop across the ecosystem: `to_json_schema()` exports provider-ready schemas for OpenAI/Azure, Databricks `ai_query`, and open-weight runtimes (vLLM/Ollama); generated models drop straight into LangChain/LangGraph; and prompt utilities (`prompt.to_template()`, `prompt.format_error()`, `RetryContext`) drive any provider's retry loop, Claude included. Designed for Databricks, Kubernetes, serverless, and edge environments.
 
 ## Commands
 

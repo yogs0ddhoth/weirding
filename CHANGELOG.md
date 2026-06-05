@@ -7,6 +7,20 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added
+- `weirding.to_json_schema(ir, *, strict=False)` — provider-ready JSON Schema export from
+  the IR. `strict=False` strips `x-weirding-*` for a clean draft 2020-12 artifact
+  (vLLM/Ollama/jsonschema); `strict=True` emits the OpenAI ∩ Databricks intersection
+  accepted by OpenAI/Azure Structured Outputs and Databricks `ai_query` `responseFormat`
+- Integration guides for LangChain/LangGraph, OpenAI/Azure, open-weight runtimes
+  (vLLM/Ollama), and Databricks/PySpark
+
+### Changed
+- Generated models now propagate the schema's top-level `description` to `Model.__doc__`,
+  so LangChain/Anthropic tool definitions receive a real description instead of an empty one
+- Positioning is now ecosystem-neutral — Claude is one peer among first-class
+  structured-output targets (LangChain/LangGraph, OpenAI/Azure, vLLM/Ollama, Databricks)
+
 ## [0.1.0] — 2026-05-31
 
 ### Added
