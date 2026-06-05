@@ -202,3 +202,58 @@ def test_default_name_is_model() -> None:
     }
     Model = build_model(schema)
     assert Model.__name__ == "Model"
+
+
+# ---------------------------------------------------------------------------
+# 10. Top-level description → generated class __doc__ (ADR-0011)
+# ---------------------------------------------------------------------------
+
+
+def test_top_level_description_propagates_to_doc() -> None:
+    description = "A response from the assistant with a name and a score."
+    schema = {
+        "type": "object",
+        "description": description,
+        "properties": {
+            "name": {"type": "string"},
+            "score": {"type": "integer"},
+        },
+        "required": ["name", "score"],
+    }
+    Model = build_model(schema)
+    assert Model.__doc__ == description
+    assert Model.model_json_schema()["description"] == description
+
+
+def test_no_description_leaves_doc_none() -> None:
+    schema = {
+        "type": "object",
+        "properties": {"val": {"type": "string"}},
+        "required": ["val"],
+    }
+    Model = build_model(schema)
+    assert Model.__doc__ is None
+
+
+# ---------------------------------------------------------------------------
+# 11. Regression guard: extra="forbid" survives description propagation
+# ---------------------------------------------------------------------------
+
+
+def test_extra_forbid_still_enforced_with_description() -> None:
+    description = "A strict object that forbids unexpected fields."
+    schema = {
+        "type": "object",
+        "description": description,
+        "properties": {"f": {"type": "string"}},
+        "required": ["f"],
+        "additionalProperties": False,
+    }
+    Model = build_model(schema)
+    # Description propagation holds.
+    assert Model.__doc__ == description
+    # extra="forbid" behavior holds simultaneously.
+    instance = Model.model_validate({"f": "hello"})
+    assert instance.f == "hello"  # type: ignore[attr-defined]
+    with pytest.raises(ValidationError):
+        Model.model_validate({"f": "hello", "unexpected": "extra"})
