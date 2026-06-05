@@ -15,6 +15,7 @@ from weirding._exceptions import (
     UnsupportedDialectError,
     WeirdingError,
 )
+from weirding._export import to_json_schema
 from weirding._parser import make_parser
 from weirding._schema import compile_schema
 from weirding._serializers import _xml_to_dict
@@ -34,6 +35,7 @@ __all__ = [
     "define_model",
     "from_schema",
     "parse",
+    "to_json_schema",
     "to_xml",
 ]
 
