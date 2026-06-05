@@ -3,6 +3,7 @@
 Run with: pytest tests/test_schema_pbt.py
 Fast-iteration: pytest -k "not pbt"  (excludes this file via marker)
 """
+
 import string
 
 import pytest

@@ -7,17 +7,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
-### Changed
-- ruff D rules with Google docstring convention now enforced across `src/`
-- `json-schema-to-pydantic` version pin tightened to `>=0.4.7,<1`
-
-### Added
-- Coverage threshold: 90% minimum enforced in CI (`--cov-fail-under=90`)
-- Nine project standards codified: async policy, logging policy, dependency pinning strategy,
-  `JsonSchemaIR` semver contract, docstring convention, parametrize policy, PBT file
-  separation, `PydanticBuilder` placement, and coverage threshold
-
-## [0.1.0] — 2026-04-30
+## [0.1.0] — 2026-05-31
 
 ### Added
 - `compile(xml)` — XML schema → JSON Schema IR dict (plain-attribute annotation dialect)
@@ -36,3 +26,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
   - Dialect auto-detected from root element tag (`{http://www.w3.org/2001/XMLSchema}schema`)
 - Secure XML parsing: `resolve_entities=False`, `no_network=True`, `load_dtd=False`
 - XXE and billion-laughs attack prevention verified by security tests
+- Coverage threshold: 90% minimum enforced in CI (`--cov-fail-under=90`)
+- Nine project standards codified: async policy, logging policy, dependency pinning strategy,
+  `JsonSchemaIR` semver contract, docstring convention, parametrize policy, PBT file
+  separation, `PydanticBuilder` placement, and coverage threshold
+
+### Changed
+- ruff D rules with Google docstring convention now enforced across `src/`
+- `json-schema-to-pydantic` version pin tightened to `>=0.4.7,<1`
