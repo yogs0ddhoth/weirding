@@ -10,6 +10,8 @@
         - from_schema
         - parse
         - to_xml
+        - to_schema
+        - dump_xml
 
 ## Prompt utilities
 

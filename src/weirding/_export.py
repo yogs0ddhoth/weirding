@@ -15,6 +15,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
+from weirding import _refs
 from weirding._exceptions import SchemaError
 from weirding._types import JsonSchemaIR
 
@@ -248,38 +249,50 @@ def _collapse_nullable(
 
 
 def _resolve_ref(node: dict[str, Any], defs_map: dict[str, Any]) -> dict[str, Any]:
-    """Inline a local ``$ref`` against ``defs_map`` and merge sibling keywords."""
+    """Inline a local ``$ref`` against ``defs_map`` and merge sibling keywords.
+
+    Wraps the neutral :func:`weirding._refs.resolve_ref` core, translating its
+    neutral errors into the strict-mode message wording this module's callers
+    (and tests) expect.
+    """
     ref = node["$ref"]
-    target = _lookup_def(ref, defs_map)
-    merged = copy.deepcopy(target)
-    if not isinstance(merged, dict):
-        raise SchemaError(
-            f"Cannot export schema in strict mode: '$ref' target {ref!r} is not "
-            "a schema object."
-        )
-    for key, value in node.items():
-        if key == "$ref":
-            continue
-        merged.setdefault(key, value)
-    return merged
+    try:
+        return _refs.resolve_ref(node, defs_map)
+    except SchemaError as exc:
+        raise SchemaError(_strict_ref_message(ref, defs_map)) from exc
 
 
 def _lookup_def(ref: str, defs_map: dict[str, Any]) -> Any:
-    """Look up a local ``#/$defs/NAME`` reference, raising if unresolvable."""
+    """Look up a local ``#/$defs/NAME`` reference, raising if unresolvable.
+
+    Wraps the neutral :func:`weirding._refs.lookup_def` core, translating its
+    neutral errors into the strict-mode message wording.
+    """
+    try:
+        return _refs.lookup_def(ref, defs_map)
+    except SchemaError as exc:
+        raise SchemaError(_strict_ref_message(ref, defs_map)) from exc
+
+
+def _strict_ref_message(ref: str, defs_map: dict[str, Any]) -> str:
+    """Return the strict-mode error text for an unusable ``$ref``."""
     prefix = "#/$defs/"
     if not ref.startswith(prefix):
-        raise SchemaError(
+        return (
             f"Cannot export schema in strict mode: '$ref' {ref!r} is not a local "
             "'#/$defs/...' reference. Databricks forbids '$ref'; only inlinable "
             "local references are supported."
         )
     name = ref[len(prefix) :]
     if name not in defs_map:
-        raise SchemaError(
+        return (
             f"Cannot export schema in strict mode: '$ref' {ref!r} cannot be "
             "resolved against the document's '$defs'."
         )
-    return defs_map[name]
+    return (
+        f"Cannot export schema in strict mode: '$ref' target {ref!r} is not "
+        "a schema object."
+    )
 
 
 # ---------------------------------------------------------------------------

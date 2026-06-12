@@ -8,6 +8,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [Unreleased]
 
 ### Added
+- `weirding.to_schema(model)` — reverse edge C→B: derive a JSON Schema IR dict from a
+  Pydantic v2 model class (the inverse of `from_schema`), normalizing
+  `model.model_json_schema()` so it tracks Pydantic's own type→schema logic
+- `weirding.dump_xml(ir)` — reverse edge B→A: serialize a JSON Schema IR back to a canonical
+  ADR-0001 XML *schema document* (the inverse of `compile`). Distinct from `to_xml`, which
+  serializes a model *instance* to XML *data*. Together with `to_schema` this closes the
+  XML ↔ JSON Schema ↔ Pydantic fungibility loop; `C→A` is the composition
+  `dump_xml(to_schema(model))` (ADR-0012)
 - `weirding.to_json_schema(ir, *, strict=False)` — provider-ready JSON Schema export from
   the IR. `strict=False` strips `x-weirding-*` for a clean draft 2020-12 artifact
   (vLLM/Ollama/jsonschema); `strict=True` emits the OpenAI ∩ Databricks intersection
