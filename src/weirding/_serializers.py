@@ -8,6 +8,8 @@ from lxml import etree
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
+from weirding._itemtag import item_tag_fallback
+
 # ---------------------------------------------------------------------------
 # Scalar rendering
 # ---------------------------------------------------------------------------
@@ -43,9 +45,7 @@ def _item_tag_for_field(field_name: str, field_info: FieldInfo) -> str:
             return tag
 
     # Fallback: strip trailing "s", or use "item"
-    if field_name.endswith("s") and len(field_name) > 1:
-        return field_name[:-1]
-    return "item"
+    return item_tag_fallback(field_name)
 
 
 # ---------------------------------------------------------------------------

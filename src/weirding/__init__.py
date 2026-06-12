@@ -1,4 +1,8 @@
-"""weirding public API: compile, from_schema, define_model, parse, to_xml."""
+"""weirding public API: the XML <-> JSON Schema IR <-> Pydantic triangle.
+
+Exports compile, from_schema, define_model, parse, to_xml, to_schema, and
+dump_xml — the full edge set of the triangle (ADR-0012).
+"""
 
 from __future__ import annotations
 
@@ -9,6 +13,7 @@ from lxml import etree
 from pydantic import BaseModel
 from pydantic import ValidationError as PydanticValidationError
 
+from weirding._decompile import dump_xml as _dump_xml
 from weirding._exceptions import (
     ParseError,
     SchemaError,
@@ -16,6 +21,7 @@ from weirding._exceptions import (
     WeirdingError,
 )
 from weirding._export import to_json_schema
+from weirding._introspect import to_schema as _to_schema
 from weirding._parser import make_parser
 from weirding._schema import compile_schema
 from weirding._serializers import _xml_to_dict
@@ -33,9 +39,11 @@ __all__ = [
     "WeirdingError",
     "compile",
     "define_model",
+    "dump_xml",
     "from_schema",
     "parse",
     "to_json_schema",
+    "to_schema",
     "to_xml",
 ]
 
@@ -240,3 +248,83 @@ def to_xml(instance: BaseModel) -> str:
 
     """
     return _to_xml(instance)
+
+
+def to_schema(model: type[BaseModel]) -> JsonSchemaIR:
+    """Derive a JSON Schema IR dict from a Pydantic v2 model class.
+
+    The reverse edge C → B — the inverse of from_schema() (ADR-0012). Rather
+    than reimplementing type extraction, it normalizes model.model_json_schema()
+    into weirding's IR, so it tracks Pydantic's own type → schema logic across
+    releases.
+
+    Array properties that lack the x-weirding-item-tag extension key (hand-written
+    models not built by weirding) receive a synthesized tag via the same
+    singularization fallback used by to_xml() (tags → tag, else item), keyed on
+    the property name. Models produced by from_schema() already carry the tag and
+    are passed through unchanged. The required list is restored as [] on any
+    object node where Pydantic omitted it, keeping the IR symmetric with compile().
+
+    $defs / $ref produced by Pydantic for nested models are left intact; resolving
+    them is dump_xml()'s concern, not this one. Consequently
+    to_schema(from_schema(ir)) equals ir only modulo $ref-inlining and the additive
+    title / default keys Pydantic injects — exact dict equality is not guaranteed.
+
+    The model is never mutated; the function operates on a deep copy of Pydantic's
+    schema output and returns a new dict.
+
+    Args:
+        model: A Pydantic v2 BaseModel subclass.
+
+    Returns:
+        A new JSON Schema IR dict. May contain $defs / $ref when the model has
+        nested object fields.
+
+    Raises:
+        SchemaError: The model's schema contains prefixItems (a tuple field),
+            which is unrepresentable in the IR (ADR-0004, MEMORY rule 11).
+
+    """
+    return _to_schema(model)
+
+
+def dump_xml(ir: JsonSchemaIR) -> str:
+    """Serialize a JSON Schema IR dict to a canonical XML schema document.
+
+    The reverse edge B → A — the inverse of compile() (ADR-0012). It emits a
+    canonical ADR-0001 plain-attribute annotation XML *schema document* from the
+    public JsonSchemaIR dict.
+
+    Distinct from to_xml(): dump_xml(ir) serializes a **JSON Schema IR into an XML
+    schema document** — the authoring format, the inverse of compile(). to_xml(instance)
+    serializes a **model instance into XML data** — the inverse of parse(). One
+    produces a schema you could re-author; the other produces a data payload.
+
+    The composition C → A (Pydantic model → XML schema document) is exactly
+    dump_xml(to_schema(model)); no third function exists for it (ADR-0012).
+
+    Any local $ref / $defs are inlined first; the root element name is taken from
+    ir['title'] (falling back to "Model"). The two nullable input shapes
+    anyOf:[T, null] and type:[T, "null"] both map to nullable="true". format and
+    additionalProperties are dropped (no annotation-convention equivalent); const
+    is rejected.
+
+    The function is pure: it deep-copies its input, never mutates it, and performs
+    no I/O, logging, or network access.
+
+    Args:
+        ir: A JSON Schema IR dict, as produced by compile() or any compatible
+            source. Must be acyclic and free of non-null unions.
+
+    Returns:
+        A pretty-printed XML schema document using the ADR-0001 plain-attribute
+        annotation convention.
+
+    Raises:
+        SchemaError: The IR contains a construct with no annotation-convention
+            representation — a non-null anyOf / oneOf / allOf, a const, or a
+            cyclic / non-local / unresolvable $ref. The message names the
+            offending construct.
+
+    """
+    return _dump_xml(ir)

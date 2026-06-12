@@ -8,7 +8,7 @@ future agent would need to avoid re-litigating.
 ## Core Facts
 
 - **Language / Stack:** Python 3.11+, pydantic>=2.0, lxml>=4.9.2, json-schema-to-pydantic>=0.4, uv
-- **Current phase:** Phase 05 — Ecosystem Interop (in progress on `feat/phase-05-ecosystem-interop`); 0.1.0 shipped (PR #5 merged, docs live). Phase 04 — Distribution complete.
+- **Current phase:** Phase 06 — Reverse Edges (in progress on `feat/phase-06-reverse-edges`): `to_schema` (C→B) + `dump_xml` (B→A) close the XML ↔ JSON Schema ↔ Pydantic fungibility loop per ADR-0012. Phase 05 — Ecosystem Interop complete (PR #6 merged). 0.1.0 shipped.
 - **Framework version:** 0.3.0
 - **Roadmap:** `docs/planning/PROJECT_ROADMAP.md`
 - **ADRs:** `docs/adr/` — read before touching any component
@@ -55,6 +55,8 @@ agents. Never run verbose or iterative commands in the main session.
   - `define_model(xml: str | bytes, *, builder: DTOBuilder | None = None) -> type` — convenience: `from_schema(compile(xml), name=<root_tag>, builder=builder)`
   - `parse(xml: str | bytes, model: Validatable) -> Any` — XML data → validated instance; `model` parameter is a `Validatable` Protocol
   - `to_xml(instance: BaseModel) -> str` — model instance → XML string
+  - `to_schema(model: type[BaseModel]) -> JsonSchemaIR` — reverse edge C→B, inverse of `from_schema`; normalizes `model.model_json_schema()` (ADR-0012)
+  - `dump_xml(ir: JsonSchemaIR) -> str` — reverse edge B→A, inverse of `compile`; emits an ADR-0001 XML *schema document* (distinct from `to_xml`, which emits XML *data* from an instance). C→A is the composition `dump_xml(to_schema(model))` — no third function (ADR-0012)
   - `DTOBuilder` Protocol — `build(schema, *, name) -> type`; symmetric with `Validatable`; both ends of pipeline are backend-neutral
   - `PydanticBuilder` — default `DTOBuilder` implementation; wraps `json-schema-to-pydantic` with two patches
 - **`Validatable` Protocol**: `def model_validate(cls, data: dict[str, Any]) -> Any` classmethod. Satisfied by every Pydantic `BaseModel` subclass. Allows `parse()` to work with future non-Pydantic validators without changing the public signature.
@@ -107,3 +109,22 @@ agents. Never run verbose or iterative commands in the main session.
   separate from deterministic tests. Use `pytest -k "not pbt"` for fast-iteration runs.
   Settings: `@settings(max_examples=100)` for leaf strategies, `@settings(max_examples=30)`
   for recursive tree strategies. Commit `.hypothesis/` directory (small; enables CI replay).
+
+- **Reverse-edge functions** (added 2026-06-11, ADR-0012): `to_schema(model) -> JsonSchemaIR`
+  (C→B, inverse of `from_schema`) in `_introspect.py` and `dump_xml(ir) -> str` (B→A, inverse
+  of `compile`) in `_decompile.py`, both exported from `__all__`. C→A is the documented
+  composition `dump_xml(to_schema(model))` — deliberately no third function. Both are pure
+  (deep-copy in, no mutation/IO/logging) like `to_json_schema` (ADR-0010). Semver-minor; IR
+  format unchanged (ADR-0002 contract intact). **Two implementation normalizations:**
+  (a) `to_schema` restores `required: []` on object nodes where Pydantic's `model_json_schema()`
+  omits it (no required fields), to stay symmetric with canonical `compile()` IR;
+  (b) round-trip equivalence `to_schema(from_schema(ir)) ≈ ir` is defined **modulo `$ref`-inlining
+  plus additive `title`/`default` noise** — Pydantic unconditionally hoists nested models into
+  `$defs`/`$ref`, so exact dict equality is NOT asserted on the `to_schema` output. The genuinely
+  canonical, fully-inlined round trip `compile(dump_xml(ir)) == ir` IS asserted exactly.
+  `dump_xml` is **partial**: it accepts the nullable pattern in both `anyOf:[T,null]` and
+  `type:[T,"null"]` shapes, drops `format`/`additionalProperties` (no annotation equivalent),
+  and raises `SchemaError` on non-null `anyOf`/`oneOf`/`allOf`, `const`, and cyclic/non-local/
+  unresolvable `$ref`. Shared local-`$ref` resolution core lives in `_refs.py` (neutral wording),
+  wrapped by both `_export` (strict-mode phrasing) and `_decompile`. The `tags`→`tag`/`item`
+  singularization fallback is shared via `_itemtag.py` between `to_schema` and `_serializers`.
