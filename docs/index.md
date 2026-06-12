@@ -66,6 +66,36 @@ startup and cache the result.
 
 ---
 
+## Reverse edges — full 3-way conversion
+
+The conversion loop is closed: every edge of the XML ↔ JSON Schema ↔ Pydantic triangle has
+a function (ADR-0012). Alongside the forward path above, `to_schema()` derives an IR back
+out of a model and `dump_xml()` re-emits the XML *schema document* from an IR.
+
+```python
+import weirding
+
+Model = weirding.define_model("<Point><x type='number'/><y type='number'/></Point>")
+
+ir = weirding.to_schema(Model)       # Pydantic model → JSON Schema IR dict
+xml_schema = weirding.dump_xml(ir)   # JSON Schema IR → XML schema document
+
+# Model straight to XML schema is the one-liner:
+weirding.dump_xml(weirding.to_schema(Model))
+```
+
+`dump_xml()` serializes a **schema** — the authoring document, the inverse of `compile()`.
+This is distinct from `to_xml()`, which serializes a model **instance** into XML *data* (the
+inverse of `parse()`). One produces a schema you could re-author; the other produces a data
+payload.
+
+For ecosystem export, `to_json_schema(ir, *, strict=False)` turns the IR into a
+provider-ready JSON Schema — clean draft 2020-12 by default (vLLM, Ollama, `jsonschema`), or
+the stricter OpenAI ∩ Databricks intersection with `strict=True`. See the
+[integration guides](integrations/langchain.md) for provider-specific recipes.
+
+---
+
 ## XSD support
 
 weirding auto-detects XSD schemas from the root element namespace. Install `weirding[xsd]`
