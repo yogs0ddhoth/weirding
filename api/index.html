@@ -1,0 +1,3953 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="XML ↔ Pydantic v2 conversion for structured AI output workflows">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../integrations/langchain/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>API Reference - weirding</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="weirding" class="md-header__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            weirding
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="weirding" class="md-nav__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    weirding
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        weirding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="weirding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.compile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.define_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        define_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.from_schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.parse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.to_xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_xml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.to_schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.dump_xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dump_xml
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt utilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding.prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompt
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="prompt">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RetryContext
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RetryContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.attempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.exceeded" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exceeded
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.record_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        record_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.retry_message" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        retry_message
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.to_template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.format_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        format_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protocols-and-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protocols and types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        weirding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="weirding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.JsonSchemaIR" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonSchemaIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.DTOBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DTOBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DTOBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.DTOBuilder.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.PydanticBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PydanticBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PydanticBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.PydanticBuilder.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.Validatable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validatable
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validatable">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.Validatable.model_validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model_validate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exceptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        weirding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="weirding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.WeirdingError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WeirdingError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.SchemaError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SchemaError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.ParseError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ParseError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.UnsupportedDialectError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UnsupportedDialectError
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integrations/langchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LangChain & LangGraph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integrations/openai-azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI & Azure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integrations/open-weight/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Open-weight (vLLM/Ollama)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integrations/databricks-pyspark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks & PySpark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        weirding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="weirding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.compile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.define_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        define_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.from_schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.parse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.to_xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_xml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.to_schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.dump_xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dump_xml
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt utilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding.prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompt
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="prompt">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RetryContext
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RetryContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.attempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.exceeded" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exceeded
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.record_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        record_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.RetryContext.retry_message" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        retry_message
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.to_template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.prompt.format_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        format_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protocols-and-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protocols and types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        weirding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="weirding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.JsonSchemaIR" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JsonSchemaIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.DTOBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DTOBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DTOBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.DTOBuilder.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.PydanticBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PydanticBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PydanticBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.PydanticBuilder.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.Validatable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validatable
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validatable">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.Validatable.model_validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model_validate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exceptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weirding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        weirding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="weirding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weirding.WeirdingError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WeirdingError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.SchemaError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SchemaError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.ParseError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ParseError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weirding.UnsupportedDialectError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UnsupportedDialectError
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="api-reference">API Reference</h1>
+<h2 id="core-pipeline">Core pipeline</h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="weirding" class="doc doc-heading">
+            <code>weirding</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>weirding public API: the XML &lt;-&gt; JSON Schema IR &lt;-&gt; Pydantic triangle.</p>
+<p>Exports compile, from_schema, define_model, parse, to_xml, to_schema, and
+dump_xml — the full edge set of the triangle (ADR-0012).</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.compile" class="doc doc-heading">
+            <code class="highlight language-python"><span class="nb">compile</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Convert an XML schema document to a JSON Schema IR dict.</p>
+<p>The JSON Schema dict is the core product of weirding. It can be consumed
+directly (Databricks StructType, jsonschema.validate, OpenAPI specs) or
+passed to from_schema() to build a typed DTO.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>xml</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="bytes">bytes</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>XML schema document using the plain-attribute annotation convention
+ or XSD. XSD requires the weirding[xsd] extra.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="JsonSchemaIR = dict[str, Any]
+
+  
+      module-attribute
+   (weirding._types.JsonSchemaIR)" href="#weirding.JsonSchemaIR">JsonSchemaIR</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JSON Schema-compatible dict (draft 2020-12 subset). Array fields include</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="JsonSchemaIR = dict[str, Any]
+
+  
+      module-attribute
+   (weirding._types.JsonSchemaIR)" href="#weirding.JsonSchemaIR">JsonSchemaIR</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>an x-weirding-item-tag extension key naming the child element tag.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="SchemaError (weirding._exceptions.SchemaError)" href="#weirding.SchemaError">SchemaError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>schema document is structurally invalid.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="UnsupportedDialectError (weirding._exceptions.UnsupportedDialectError)" href="#weirding.UnsupportedDialectError">UnsupportedDialectError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dialect cannot be detected or is unsupported.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ParseError (weirding._exceptions.ParseError)" href="#weirding.ParseError">ParseError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>xml is not well-formed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compile</span><span class="p">(</span><span class="n">xml</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JsonSchemaIR</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an XML schema document to a JSON Schema IR dict.</span>
+
+<span class="sd">    The JSON Schema dict is the core product of weirding. It can be consumed</span>
+<span class="sd">    directly (Databricks StructType, jsonschema.validate, OpenAPI specs) or</span>
+<span class="sd">    passed to from_schema() to build a typed DTO.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        xml: XML schema document using the plain-attribute annotation convention</span>
+<span class="sd">             or XSD. XSD requires the weirding[xsd] extra.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        JSON Schema-compatible dict (draft 2020-12 subset). Array fields include</span>
+<span class="sd">        an x-weirding-item-tag extension key naming the child element tag.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        SchemaError: schema document is structurally invalid.</span>
+<span class="sd">        UnsupportedDialectError: dialect cannot be detected or is unsupported.</span>
+<span class="sd">        ParseError: xml is not well-formed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">compile_schema</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.define_model" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">define_model</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">builder</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compile XML then build a typed DTO, naming the type from the root element tag.</p>
+
+
+<details class="equivalent-to" open>
+  <summary>Equivalent to</summary>
+  <p>schema = compile(xml)
+return from_schema(schema, name=<sanitized root element tag>, builder=builder)</p>
+</details>
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>xml</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="bytes">bytes</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>XML schema document (plain-attribute convention or XSD).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>builder</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="DTOBuilder (weirding.DTOBuilder)" href="#weirding.DTOBuilder">DTOBuilder</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DTOBuilder implementation. Defaults to PydanticBuilder().</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="type">type</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A new type produced by the builder.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">define_model</span><span class="p">(</span>
+    <span class="n">xml</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">builder</span><span class="p">:</span> <span class="n">DTOBuilder</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compile XML then build a typed DTO, naming the type from the root element tag.</span>
+
+<span class="sd">    Equivalent to:</span>
+<span class="sd">        schema = compile(xml)</span>
+<span class="sd">        return from_schema(schema, name=&lt;sanitized root element tag&gt;, builder=builder)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        xml:     XML schema document (plain-attribute convention or XSD).</span>
+<span class="sd">        builder: DTOBuilder implementation. Defaults to PydanticBuilder().</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A new type produced by the builder.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">_sanitize_name</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;Model&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">from_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">builder</span><span class="o">=</span><span class="n">builder</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.from_schema" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">from_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Model&#39;</span><span class="p">,</span> <span class="n">builder</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+          <div class="doc-overloads">
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span> <span class="n">builder</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span> <span class="n">builder</span><span class="p">:</span> <span class="n">DTOBuilder</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span>
+</code></pre></div>          </div>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Build a typed DTO class from a JSON Schema IR dict.</p>
+<p>With the default builder (PydanticBuilder), returns a Pydantic v2
+BaseModel subclass. Pass a custom DTOBuilder to produce TypedDicts,
+dataclasses, Spark StructType wrappers, or any other typed container.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>schema</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="JsonSchemaIR = dict[str, Any]
+
+  
+      module-attribute
+   (weirding._types.JsonSchemaIR)" href="#weirding.JsonSchemaIR">JsonSchemaIR</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JSON Schema dict as produced by compile() or any compatible source.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Class name for the generated type. Must be a valid Python identifier.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;Model&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>builder</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="DTOBuilder (weirding.DTOBuilder)" href="#weirding.DTOBuilder">DTOBuilder</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DTOBuilder implementation. Defaults to PydanticBuilder().</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="type">type</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A new type produced by the builder. Each call with a distinct schema produces</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="type">type</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>a distinct class; cache the result if calling in a hot path.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="SchemaError (weirding._exceptions.SchemaError)" href="#weirding.SchemaError">SchemaError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>schema cannot be converted to a valid typed class.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_schema</span><span class="p">(</span>
+    <span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Model&quot;</span><span class="p">,</span>
+    <span class="n">builder</span><span class="p">:</span> <span class="n">DTOBuilder</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a typed DTO class from a JSON Schema IR dict.</span>
+
+<span class="sd">    With the default builder (PydanticBuilder), returns a Pydantic v2</span>
+<span class="sd">    BaseModel subclass. Pass a custom DTOBuilder to produce TypedDicts,</span>
+<span class="sd">    dataclasses, Spark StructType wrappers, or any other typed container.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        schema:  JSON Schema dict as produced by compile() or any compatible source.</span>
+<span class="sd">        name:    Class name for the generated type. Must be a valid Python identifier.</span>
+<span class="sd">        builder: DTOBuilder implementation. Defaults to PydanticBuilder().</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A new type produced by the builder. Each call with a distinct schema produces</span>
+<span class="sd">        a distinct class; cache the result if calling in a hot path.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        SchemaError: schema cannot be converted to a valid typed class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">builder</span> <span class="ow">or</span> <span class="n">PydanticBuilder</span><span class="p">())</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.parse" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">parse</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Validate and bind LLM-produced XML against a compiled model.</p>
+<p>Deserializes the XML element tree into a dict, then calls
+model.model_validate(dict) to produce a typed instance.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>xml</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | <span title="bytes">bytes</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>XML data document (LLM output). Must be well-formed.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>model</code>
+            </td>
+            <td>
+                  <code><span title="type">type</span>[<a class="autorefs autorefs-internal" title="Validatable (weirding.Validatable)" href="#weirding.Validatable">Validatable</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Any type satisfying the Validatable protocol — in practice a
+   type produced by define_model() or from_schema().</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A validated instance of model.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ParseError (weirding._exceptions.ParseError)" href="#weirding.ParseError">ParseError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>xml is malformed or fails model validation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="n">xml</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Validatable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and bind LLM-produced XML against a compiled model.</span>
+
+<span class="sd">    Deserializes the XML element tree into a dict, then calls</span>
+<span class="sd">    model.model_validate(dict) to produce a typed instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        xml:   XML data document (LLM output). Must be well-formed.</span>
+<span class="sd">        model: Any type satisfying the Validatable protocol — in practice a</span>
+<span class="sd">               type produced by define_model() or from_schema().</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A validated instance of model.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ParseError: xml is malformed or fails model validation.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">make_parser</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">parser</span><span class="o">=</span><span class="n">parser</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">parser</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">_xml_to_dict</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">PydanticValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.to_xml" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">to_xml</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Serialize a Pydantic model instance to an XML string.</p>
+<p>Element tags map to field names, scalars become text content, objects become
+child elements, and lists are serialized as repeated child elements using the
+tag name from the original schema (x-weirding-item-tag).</p>
+<p>Round-trip guarantee: parse(to_xml(x), type(x)) == x for any instance x
+produced by parse().</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>instance</code>
+            </td>
+            <td>
+                  <code><span title="pydantic.BaseModel">BaseModel</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Any Pydantic BaseModel instance, including dynamically generated ones.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>UTF-8 XML string without an XML declaration.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_xml</span><span class="p">(</span><span class="n">instance</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serialize a Pydantic model instance to an XML string.</span>
+
+<span class="sd">    Element tags map to field names, scalars become text content, objects become</span>
+<span class="sd">    child elements, and lists are serialized as repeated child elements using the</span>
+<span class="sd">    tag name from the original schema (x-weirding-item-tag).</span>
+
+<span class="sd">    Round-trip guarantee: parse(to_xml(x), type(x)) == x for any instance x</span>
+<span class="sd">    produced by parse().</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        instance: Any Pydantic BaseModel instance, including dynamically generated ones.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        UTF-8 XML string without an XML declaration.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_to_xml</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.to_schema" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">to_schema</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Derive a JSON Schema IR dict from a Pydantic v2 model class.</p>
+<p>The reverse edge C → B — the inverse of from_schema() (ADR-0012). Rather
+than reimplementing type extraction, it normalizes model.model_json_schema()
+into weirding's IR, so it tracks Pydantic's own type → schema logic across
+releases.</p>
+<p>Array properties that lack the x-weirding-item-tag extension key (hand-written
+models not built by weirding) receive a synthesized tag via the same
+singularization fallback used by to_xml() (tags → tag, else item), keyed on
+the property name. Models produced by from_schema() already carry the tag and
+are passed through unchanged. The required list is restored as [] on any
+object node where Pydantic omitted it, keeping the IR symmetric with compile().</p>
+<p>$defs / $ref produced by Pydantic for nested models are left intact; resolving
+them is dump_xml()'s concern, not this one. Consequently
+to_schema(from_schema(ir)) equals ir only modulo $ref-inlining and the additive
+title / default keys Pydantic injects — exact dict equality is not guaranteed.</p>
+<p>The model is never mutated; the function operates on a deep copy of Pydantic's
+schema output and returns a new dict.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>model</code>
+            </td>
+            <td>
+                  <code><span title="type">type</span>[<span title="pydantic.BaseModel">BaseModel</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A Pydantic v2 BaseModel subclass.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="JsonSchemaIR = dict[str, Any]
+
+  
+      module-attribute
+   (weirding._types.JsonSchemaIR)" href="#weirding.JsonSchemaIR">JsonSchemaIR</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A new JSON Schema IR dict. May contain $defs / $ref when the model has</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="JsonSchemaIR = dict[str, Any]
+
+  
+      module-attribute
+   (weirding._types.JsonSchemaIR)" href="#weirding.JsonSchemaIR">JsonSchemaIR</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>nested object fields.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="SchemaError (weirding._exceptions.SchemaError)" href="#weirding.SchemaError">SchemaError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The model's schema contains prefixItems (a tuple field),
+which is unrepresentable in the IR (ADR-0004, MEMORY rule 11).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_schema</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">JsonSchemaIR</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Derive a JSON Schema IR dict from a Pydantic v2 model class.</span>
+
+<span class="sd">    The reverse edge C → B — the inverse of from_schema() (ADR-0012). Rather</span>
+<span class="sd">    than reimplementing type extraction, it normalizes model.model_json_schema()</span>
+<span class="sd">    into weirding&#39;s IR, so it tracks Pydantic&#39;s own type → schema logic across</span>
+<span class="sd">    releases.</span>
+
+<span class="sd">    Array properties that lack the x-weirding-item-tag extension key (hand-written</span>
+<span class="sd">    models not built by weirding) receive a synthesized tag via the same</span>
+<span class="sd">    singularization fallback used by to_xml() (tags → tag, else item), keyed on</span>
+<span class="sd">    the property name. Models produced by from_schema() already carry the tag and</span>
+<span class="sd">    are passed through unchanged. The required list is restored as [] on any</span>
+<span class="sd">    object node where Pydantic omitted it, keeping the IR symmetric with compile().</span>
+
+<span class="sd">    $defs / $ref produced by Pydantic for nested models are left intact; resolving</span>
+<span class="sd">    them is dump_xml()&#39;s concern, not this one. Consequently</span>
+<span class="sd">    to_schema(from_schema(ir)) equals ir only modulo $ref-inlining and the additive</span>
+<span class="sd">    title / default keys Pydantic injects — exact dict equality is not guaranteed.</span>
+
+<span class="sd">    The model is never mutated; the function operates on a deep copy of Pydantic&#39;s</span>
+<span class="sd">    schema output and returns a new dict.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: A Pydantic v2 BaseModel subclass.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A new JSON Schema IR dict. May contain $defs / $ref when the model has</span>
+<span class="sd">        nested object fields.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        SchemaError: The model&#39;s schema contains prefixItems (a tuple field),</span>
+<span class="sd">            which is unrepresentable in the IR (ADR-0004, MEMORY rule 11).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_to_schema</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.dump_xml" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">dump_xml</span><span class="p">(</span><span class="n">ir</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Serialize a JSON Schema IR dict to a canonical XML schema document.</p>
+<p>The reverse edge B → A — the inverse of compile() (ADR-0012). It emits a
+canonical ADR-0001 plain-attribute annotation XML <em>schema document</em> from the
+public JsonSchemaIR dict.</p>
+<p>Distinct from to_xml(): dump_xml(ir) serializes a <strong>JSON Schema IR into an XML
+schema document</strong> — the authoring format, the inverse of compile(). to_xml(instance)
+serializes a <strong>model instance into XML data</strong> — the inverse of parse(). One
+produces a schema you could re-author; the other produces a data payload.</p>
+<p>The composition C → A (Pydantic model → XML schema document) is exactly
+dump_xml(to_schema(model)); no third function exists for it (ADR-0012).</p>
+<p>Any local $ref / $defs are inlined first; the root element name is taken from
+ir['title'] (falling back to "Model"). The two nullable input shapes
+anyOf:[T, null] and type:[T, "null"] both map to nullable="true". format and
+additionalProperties are dropped (no annotation-convention equivalent); const
+is rejected.</p>
+<p>The function is pure: it deep-copies its input, never mutates it, and performs
+no I/O, logging, or network access.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>ir</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="JsonSchemaIR = dict[str, Any]
+
+  
+      module-attribute
+   (weirding._types.JsonSchemaIR)" href="#weirding.JsonSchemaIR">JsonSchemaIR</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A JSON Schema IR dict, as produced by compile() or any compatible
+source. Must be acyclic and free of non-null unions.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A pretty-printed XML schema document using the ADR-0001 plain-attribute</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>annotation convention.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="SchemaError (weirding._exceptions.SchemaError)" href="#weirding.SchemaError">SchemaError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The IR contains a construct with no annotation-convention
+representation — a non-null anyOf / oneOf / allOf, a const, or a
+cyclic / non-local / unresolvable $ref. The message names the
+offending construct.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dump_xml</span><span class="p">(</span><span class="n">ir</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serialize a JSON Schema IR dict to a canonical XML schema document.</span>
+
+<span class="sd">    The reverse edge B → A — the inverse of compile() (ADR-0012). It emits a</span>
+<span class="sd">    canonical ADR-0001 plain-attribute annotation XML *schema document* from the</span>
+<span class="sd">    public JsonSchemaIR dict.</span>
+
+<span class="sd">    Distinct from to_xml(): dump_xml(ir) serializes a **JSON Schema IR into an XML</span>
+<span class="sd">    schema document** — the authoring format, the inverse of compile(). to_xml(instance)</span>
+<span class="sd">    serializes a **model instance into XML data** — the inverse of parse(). One</span>
+<span class="sd">    produces a schema you could re-author; the other produces a data payload.</span>
+
+<span class="sd">    The composition C → A (Pydantic model → XML schema document) is exactly</span>
+<span class="sd">    dump_xml(to_schema(model)); no third function exists for it (ADR-0012).</span>
+
+<span class="sd">    Any local $ref / $defs are inlined first; the root element name is taken from</span>
+<span class="sd">    ir[&#39;title&#39;] (falling back to &quot;Model&quot;). The two nullable input shapes</span>
+<span class="sd">    anyOf:[T, null] and type:[T, &quot;null&quot;] both map to nullable=&quot;true&quot;. format and</span>
+<span class="sd">    additionalProperties are dropped (no annotation-convention equivalent); const</span>
+<span class="sd">    is rejected.</span>
+
+<span class="sd">    The function is pure: it deep-copies its input, never mutates it, and performs</span>
+<span class="sd">    no I/O, logging, or network access.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ir: A JSON Schema IR dict, as produced by compile() or any compatible</span>
+<span class="sd">            source. Must be acyclic and free of non-null unions.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A pretty-printed XML schema document using the ADR-0001 plain-attribute</span>
+<span class="sd">        annotation convention.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        SchemaError: The IR contains a construct with no annotation-convention</span>
+<span class="sd">            representation — a non-null anyOf / oneOf / allOf, a const, or a</span>
+<span class="sd">            cyclic / non-local / unresolvable $ref. The message names the</span>
+<span class="sd">            offending construct.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_dump_xml</span><span class="p">(</span><span class="n">ir</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="prompt-utilities">Prompt utilities</h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="weirding.prompt" class="doc doc-heading">
+            <code>weirding.prompt</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Prompt engineering utilities for LLM structured-output retry workflows.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.prompt.RetryContext" class="doc doc-heading">
+            <code>RetryContext</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Stateful context for an LLM structured-output retry loop.</p>
+<p>Tracks attempt count and accumulated errors so that format_error()
+can produce increasingly specific retry prompts without the caller
+managing state.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/prompt.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RetryContext</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stateful context for an LLM structured-output retry loop.</span>
+
+<span class="sd">    Tracks attempt count and accumulated errors so that format_error()</span>
+<span class="sd">    can produce increasingly specific retry prompts without the caller</span>
+<span class="sd">    managing state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">],</span> <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with the given model and an optional max-attempts limit.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_attempts</span> <span class="o">=</span> <span class="n">max_attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attempt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the current attempt number (0-based before first error).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attempt</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exceeded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if the maximum number of retry attempts has been reached.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_attempts</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a validation error and increment the attempt counter.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_message</span> <span class="o">=</span> <span class="n">format_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">retry_message</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the formatted error message from the last recorded error.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_message</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="weirding.prompt.RetryContext.attempt" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">attempt</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the current attempt number (0-based before first error).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="weirding.prompt.RetryContext.exceeded" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">exceeded</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return True if the maximum number of retry attempts has been reached.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="weirding.prompt.RetryContext.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">max_attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize with the given model and an optional max-attempts limit.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/prompt.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">],</span> <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize with the given model and an optional max-attempts limit.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_max_attempts</span> <span class="o">=</span> <span class="n">max_attempts</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_attempt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_last_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="weirding.prompt.RetryContext.record_error" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">record_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Record a validation error and increment the attempt counter.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/prompt.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">record_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Record a validation error and increment the attempt counter.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_last_message</span> <span class="o">=</span> <span class="n">format_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="weirding.prompt.RetryContext.retry_message" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">retry_message</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the formatted error message from the last recorded error.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/prompt.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">retry_message</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the formatted error message from the last recorded error.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_message</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.prompt.to_template" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">to_template</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Generate an XML prompt template from a compiled Pydantic model.</p>
+<p>Produces an XML document showing the expected element structure and
+field types, suitable for inclusion in an LLM system prompt. Scalar
+fields are rendered as <field>{type}</field>; objects as nested elements.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>model</code>
+            </td>
+            <td>
+                  <code><span title="type">type</span>[<span title="pydantic.BaseModel">BaseModel</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A type[BaseModel] produced by define_model() or from_schema().</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>XML string showing the expected output format.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/prompt.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_template</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate an XML prompt template from a compiled Pydantic model.</span>
+
+<span class="sd">    Produces an XML document showing the expected element structure and</span>
+<span class="sd">    field types, suitable for inclusion in an LLM system prompt. Scalar</span>
+<span class="sd">    fields are rendered as &lt;field&gt;{type}&lt;/field&gt;; objects as nested elements.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: A type[BaseModel] produced by define_model() or from_schema().</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        XML string showing the expected output format.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">_render_model_fields</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;unicode&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="weirding.prompt.format_error" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">format_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Format a validation error into a natural-language retry instruction.</p>
+<p>Converts pydantic.ValidationError (or weirding.ParseError wrapping one)
+into a human-readable description of what the LLM got wrong, suitable
+for appending to a retry prompt.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>error</code>
+            </td>
+            <td>
+                  <code><span title="Exception">Exception</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The exception raised by parse() on the failed attempt.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>model</code>
+            </td>
+            <td>
+                  <code><span title="type">type</span>[<span title="pydantic.BaseModel">BaseModel</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The model that was being validated against. Used to provide
+   field-level context in the error message.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Plain text description of the validation failures.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/prompt.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format_error</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a validation error into a natural-language retry instruction.</span>
+
+<span class="sd">    Converts pydantic.ValidationError (or weirding.ParseError wrapping one)</span>
+<span class="sd">    into a human-readable description of what the LLM got wrong, suitable</span>
+<span class="sd">    for appending to a retry prompt.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        error: The exception raised by parse() on the failed attempt.</span>
+<span class="sd">        model: The model that was being validated against. Used to provide</span>
+<span class="sd">               field-level context in the error message.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Plain text description of the validation failures.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Unwrap ParseError — weirding raises ParseError(str(exc)) from exc</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">ParseError</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">error</span><span class="o">.</span><span class="n">__cause__</span><span class="p">,</span> <span class="n">_PydanticValidationError</span>
+    <span class="p">):</span>
+        <span class="n">ve</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">__cause__</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">_PydanticValidationError</span><span class="p">):</span>
+        <span class="n">ve</span> <span class="o">=</span> <span class="n">error</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Unexpected error: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">ve</span><span class="o">.</span><span class="n">errors</span><span class="p">(</span><span class="n">include_url</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_context</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="c1"># PRIVACY: include_input=False is MANDATORY.</span>
+        <span class="c1"># LLM output may contain user-submitted PII. Never echo input values</span>
+        <span class="c1"># into retry messages — this violates CLAUDE.md privacy requirements.</span>
+        <span class="c1"># Any future include_values=True opt-in requires explicit privacy review.</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_loc_to_path</span><span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="s2">&quot;loc&quot;</span><span class="p">])</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">err</span><span class="p">[</span><span class="s2">&quot;msg&quot;</span><span class="p">]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;  - </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">count</span> <span class="o">=</span> <span class="n">ve</span><span class="o">.</span><span class="n">error_count</span><span class="p">()</span>
+    <span class="n">noun</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span> <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;errors&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;The previous response had </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> validation </span><span class="si">{</span><span class="n">noun</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="protocols-and-types">Protocols and types</h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="weirding" class="doc doc-heading">
+            <code>weirding</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>weirding public API: the XML &lt;-&gt; JSON Schema IR &lt;-&gt; Pydantic triangle.</p>
+<p>Exports compile, from_schema, define_model, parse, to_xml, to_schema, and
+dump_xml — the full edge set of the triangle (ADR-0012).</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="weirding.JsonSchemaIR" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">JsonSchemaIR</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.DTOBuilder" class="doc doc-heading">
+            <code>DTOBuilder</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+
+
+        <p>Any type that can build a typed DTO class from a JSON Schema IR dict.</p>
+<p>The default implementation is PydanticBuilder, which produces Pydantic v2
+BaseModel subclasses. Custom implementations can produce TypedDicts,
+dataclasses, Spark StructType wrappers, or any other typed container.</p>
+<p>Symmetric with Validatable: both ends of the pipeline are backend-neutral.
+Pydantic is the default, not the requirement.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DTOBuilder</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Any type that can build a typed DTO class from a JSON Schema IR dict.</span>
+
+<span class="sd">    The default implementation is PydanticBuilder, which produces Pydantic v2</span>
+<span class="sd">    BaseModel subclasses. Custom implementations can produce TypedDicts,</span>
+<span class="sd">    dataclasses, Spark StructType wrappers, or any other typed container.</span>
+
+<span class="sd">    Symmetric with Validatable: both ends of the pipeline are backend-neutral.</span>
+<span class="sd">    Pydantic is the default, not the requirement.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return a DTO class from the given JSON Schema IR.&quot;&quot;&quot;</span>
+        <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="weirding.DTOBuilder.build" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">build</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Build and return a DTO class from the given JSON Schema IR.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a DTO class from the given JSON Schema IR.&quot;&quot;&quot;</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.PydanticBuilder" class="doc doc-heading">
+            <code>PydanticBuilder</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Default DTOBuilder — produces Pydantic v2 BaseModel subclasses.</p>
+
+
+<details class="engine" open>
+  <summary>json-schema-to-pydantic. Patches applied:</summary>
+  <ul>
+<li>schema["additionalProperties"] == False  →  model_config extra="forbid"</li>
+<li>prefixItems must never appear in schema (enforced by _schema.py)</li>
+</ul>
+</details>
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PydanticBuilder</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Default DTOBuilder — produces Pydantic v2 BaseModel subclasses.</span>
+
+<span class="sd">    Engine: json-schema-to-pydantic. Patches applied:</span>
+<span class="sd">      - schema[&quot;additionalProperties&quot;] == False  →  model_config extra=&quot;forbid&quot;</span>
+<span class="sd">      - prefixItems must never appear in schema (enforced by _schema.py)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Model&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a Pydantic BaseModel subclass from the given JSON Schema IR.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">weirding._models</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_model</span>
+
+        <span class="k">return</span> <span class="n">build_model</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="weirding.PydanticBuilder.build" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">build</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Model&#39;</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Build a Pydantic BaseModel subclass from the given JSON Schema IR.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">JsonSchemaIR</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Model&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a Pydantic BaseModel subclass from the given JSON Schema IR.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">weirding._models</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_model</span>
+
+    <span class="k">return</span> <span class="n">build_model</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.Validatable" class="doc doc-heading">
+            <code>Validatable</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+
+
+        <p>Any type that can validate a dict into a typed instance.</p>
+<p>Satisfied by every Pydantic BaseModel subclass. Accepting a Protocol
+instead of BaseModel directly keeps parse() open to non-Pydantic backends
+(TypeAdapter wrappers, Spark schema validators, etc.) without an API change.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Validatable</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Any type that can validate a dict into a typed instance.</span>
+
+<span class="sd">    Satisfied by every Pydantic BaseModel subclass. Accepting a Protocol</span>
+<span class="sd">    instead of BaseModel directly keeps parse() open to non-Pydantic backends</span>
+<span class="sd">    (TypeAdapter wrappers, Spark schema validators, etc.) without an API change.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate data dict and return a model instance.&quot;&quot;&quot;</span>
+        <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="weirding.Validatable.model_validate" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">model_validate</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Validate data dict and return a model instance.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/weirding/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate data dict and return a model instance.&quot;&quot;&quot;</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="exceptions">Exceptions</h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="weirding" class="doc doc-heading">
+            <code>weirding</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>weirding public API: the XML &lt;-&gt; JSON Schema IR &lt;-&gt; Pydantic triangle.</p>
+<p>Exports compile, from_schema, define_model, parse, to_xml, to_schema, and
+dump_xml — the full edge set of the triangle (ADR-0012).</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.WeirdingError" class="doc doc-heading">
+            <code>WeirdingError</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="Exception">Exception</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/_exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">WeirdingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.SchemaError" class="doc doc-heading">
+            <code>SchemaError</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="WeirdingError (weirding._exceptions.WeirdingError)" href="#weirding.WeirdingError">WeirdingError</a></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/_exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SchemaError</span><span class="p">(</span><span class="n">WeirdingError</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.ParseError" class="doc doc-heading">
+            <code>ParseError</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="WeirdingError (weirding._exceptions.WeirdingError)" href="#weirding.WeirdingError">WeirdingError</a></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/_exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParseError</span><span class="p">(</span><span class="n">WeirdingError</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="weirding.UnsupportedDialectError" class="doc doc-heading">
+            <code>UnsupportedDialectError</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="WeirdingError (weirding._exceptions.WeirdingError)" href="#weirding.WeirdingError">WeirdingError</a></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/weirding/_exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">UnsupportedDialectError</span><span class="p">(</span><span class="n">WeirdingError</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

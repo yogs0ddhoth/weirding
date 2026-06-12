@@ -1,0 +1,914 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="XML ↔ Pydantic v2 conversion for structured AI output workflows">
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>0012: Reverse-Edge Functions — Closing the XML ↔ JSON Schema ↔ Pydantic Loop - weirding</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#0012-reverse-edge-functions-closing-the-xml-json-schema-pydantic-loop" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="weirding" class="md-header__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            weirding
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              0012: Reverse-Edge Functions — Closing the XML ↔ JSON Schema ↔ Pydantic Loop
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="weirding" class="md-nav__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    weirding
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/langchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LangChain & LangGraph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/openai-azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI & Azure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/open-weight/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Open-weight (vLLM/Ollama)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/databricks-pyspark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks & PySpark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consequences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consequences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positive
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neutral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neutral
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amendment-2026-06-11-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Amendment (2026-06-11, implementation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="0012-reverse-edge-functions-closing-the-xml-json-schema-pydantic-loop">0012: Reverse-Edge Functions — Closing the XML ↔ JSON Schema ↔ Pydantic Loop</h1>
+<p><strong>Status:</strong> Accepted</p>
+<p><strong>Date:</strong> 2026-06-11</p>
+<p><strong>Authors:</strong> Ben Lin</p>
+<h2 id="context">Context</h2>
+<p>weirding models three representations of a structured-output shape:</p>
+<ul>
+<li><strong>A — XML schema document</strong>: the authoring format (plain-attribute annotation
+  convention per ADR-0001, or XSD per ADR-0006).</li>
+<li><strong>B — JSON Schema IR</strong>: the public <code>dict</code> returned by <code>compile()</code>, the canonical
+  intermediate representation (ADR-0002). The native compiler emits a fully <strong>inlined</strong>
+  IR — nested objects become inline <code>{"type":"object","properties":{...}}</code>, never
+  <code>$ref</code>/<code>$defs</code>. References appear only when an IR originates outside weirding.</li>
+<li><strong>C — Pydantic v2 model class</strong>: built from the IR by <code>from_schema()</code> (ADR-0004).</li>
+</ul>
+<p>Today the schema-level pipeline is strictly <strong>one-directional</strong>: <code>A → B → C</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Edge</th>
+<th>Function</th>
+<th>Present?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A → B</td>
+<td><code>compile(xml)</code></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>B → C</td>
+<td><code>from_schema(ir)</code></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>A → C</td>
+<td><code>define_model(xml)</code></td>
+<td>yes (composition)</td>
+</tr>
+<tr>
+<td>B → B′</td>
+<td><code>to_json_schema(ir)</code></td>
+<td>yes — forward IR→provider transform (ADR-0010), <strong>not</strong> a reverse edge</td>
+</tr>
+<tr>
+<td><strong>C → B</strong></td>
+<td>—</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td><strong>B → A</strong></td>
+<td>—</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td><strong>C → A</strong></td>
+<td>—</td>
+<td><strong>no</strong> (only <code>prompt.to_template</code>, which is a lossy prompt artifact, not a faithful schema)</td>
+</tr>
+</tbody>
+</table>
+<p>The project README and GitHub positioning describe "3-way XML ↔ JSON Schema ↔ Pydantic v2
+fungibility." Taken literally — free interconversion among all three — this is <strong>not
+currently true</strong>: nothing flows back out of the funnel as a schema. The three missing or
+lossy edges are <code>C → B</code>, <code>B → A</code>, and <code>C → A</code>.</p>
+<p>This is a decision because the reverse edges are non-obvious in two ways:</p>
+<ol>
+<li>
+<p><strong><code>C → B</code> could be reimplemented or delegated.</strong> Pydantic already exposes
+   <code>model.model_json_schema()</code> producing draft 2020-12 JSON Schema. The open question is
+   whether to reimplement IR extraction from <code>model_fields</code>, or to normalize Pydantic's
+   native output. The native output omits weirding's <code>x-weirding-item-tag</code> extension key
+   for hand-written models and may emit <code>prefixItems</code> (banned by ADR-0004 / MEMORY rule
+   11) for tuple fields.</p>
+</li>
+<li>
+<p><strong><code>B → A</code> cannot be a total function.</strong> The annotation convention (ADR-0001) has no
+   syntax for non-null unions (<code>anyOf</code>/<code>oneOf</code>/<code>allOf</code> beyond the <code>nullable</code> pattern) and
+   no reference mechanism — so cyclic/self-referential IR cannot be serialized into a
+   finite XML tree. A reverse serializer must define, and fail loudly on, the inexpressible
+   subset rather than emit silently-wrong XML.</p>
+</li>
+</ol>
+<p><strong>Alternatives considered:</strong></p>
+<ul>
+<li>
+<p><strong>Do nothing; correct the marketing instead.</strong> Reword the README to claim only a
+  forward pipeline plus a two-way <em>instance</em> round-trip (<code>parse</code>/<code>to_xml</code>). Rejected: the
+  reverse edges are genuinely useful (import a legacy Pydantic model into the XML-authoring
+  workflow; regenerate canonical XML from a hand-edited IR; produce a diffable XML schema
+  from a model for review) and the loop is nearly closed already by inlined-IR symmetry.</p>
+</li>
+<li>
+<p><strong>Reimplement <code>C → B</code> from <code>model_fields</code> directly.</strong> Rejected: duplicates the
+  type→schema logic Pydantic already owns and would drift from it across Pydantic
+  releases. Normalizing <code>model_json_schema()</code> output is strictly less code and tracks
+  upstream.</p>
+</li>
+<li>
+<p><strong>Make <code>B → A</code> total by inventing union/reference XML syntax.</strong> Rejected: extends the
+  ADR-0001 authoring vocabulary for an edge case, breaking the "idiomatic, LLM-promptable
+  XML" property that motivated the convention. Failing loudly on the inexpressible subset
+  preserves the convention.</p>
+</li>
+<li>
+<p><strong>Route <code>C → A</code> through a new dedicated function.</strong> Rejected as redundant: it is exactly
+  <code>dump_xml(to_schema(model))</code>. A third primitive adds surface area for zero new behavior.</p>
+</li>
+<li>
+<p><strong>Naming <code>decompile</code>/<code>to_xml_schema</code> for <code>B → A</code>.</strong> Considered. <code>decompile</code> pairs neatly
+  with <code>compile</code> but reads as "reverse-engineering." <code>to_xml_schema</code> is explicit but visually
+  collides with the existing <code>to_xml</code>. Chose <code>dump_xml</code> (see Decision) to follow the
+  Pydantic/<code>json.dump</code> "serialize-out" convention.</p>
+</li>
+</ul>
+<h2 id="decision">Decision</h2>
+<p>We will add two pure, reverse-edge functions to the public API, and document <code>C → A</code> as
+their composition rather than a third function.</p>
+<p><strong><code>to_schema(model: type[BaseModel]) -&gt; JsonSchemaIR</code> (edge C → B), inverse of
+<code>from_schema</code>.</strong> It normalizes <code>model.model_json_schema()</code> into IR rather than
+reimplementing extraction:</p>
+<ul>
+<li>Array properties lacking <code>x-weirding-item-tag</code> receive a synthesized tag via the <strong>same</strong>
+  singularization fallback used by <code>_serializers._item_tag_for_field</code> (<code>tags</code>→<code>tag</code>, else
+  <code>item</code>). This shared heuristic is factored into one helper imported by both call sites so
+  they cannot drift.</li>
+<li><code>prefixItems</code> (tuple fields) raises <code>SchemaError</code> naming the field — it is unrepresentable
+  in the IR (ADR-0004, MEMORY rule 11).</li>
+<li><code>$defs</code>/<code>$ref</code> are left intact; resolving them is <code>dump_xml</code>'s concern, not this one.</li>
+</ul>
+<p><strong><code>dump_xml(ir: JsonSchemaIR) -&gt; str</code> (edge B → A), inverse of <code>compile</code>.</strong> It emits a
+canonical ADR-0001 annotation XML document — the structural inverse of
+<code>_schema._element_to_schema</code>. It inlines any <code>$ref</code>/<code>$defs</code> first (reusing the resolution
+logic from <code>_export</code>), then maps each IR construct to its attribute form: <code>minLength</code>/
+<code>minItems</code>→<code>min</code>, <code>maxLength</code>/<code>maxItems</code>→<code>max</code>, <code>enum</code>→pipe-joined <code>enum</code>, the
+<code>anyOf:[T,null]</code> pattern→<code>nullable="true"</code>, a property absent from an object's <code>required</code>
+list→<code>required="false"</code>, and array <code>items</code> + <code>x-weirding-item-tag</code>→a single child template
+element. It raises <code>SchemaError</code>, naming the construct, on:</p>
+<ul>
+<li>a non-null <code>anyOf</code>/<code>oneOf</code>/<code>allOf</code> (no union syntax in the convention),</li>
+<li>a cyclic or unresolvable <code>$ref</code> (no finite XML serialization).</li>
+</ul>
+<p><strong><code>dump_xml</code> is named, not <code>to_xml_schema</code> or <code>decompile</code>.</strong> It deliberately sits beside the
+existing <code>to_xml(instance)</code>: <code>dump_xml</code> serializes a <strong>schema IR</strong> to an XML <strong>schema
+document</strong>; <code>to_xml</code> serializes a model <strong>instance</strong> to XML <strong>data</strong>. Their docstrings must
+state this distinction explicitly as the primary disambiguator.</p>
+<p><strong><code>C → A</code> is <code>dump_xml(to_schema(model))</code></strong> — documented as a one-liner, not given its own
+function.</p>
+<p>Both functions are <strong>pure</strong>: deep-copy their input, never mutate it, perform no I/O, no
+logging, no network access — matching <code>to_json_schema</code> (ADR-0010) and the project logging
+policy.</p>
+<p>This decision is <strong>additive and semver-minor</strong>. It does not alter <code>compile</code>, <code>from_schema</code>,
+the IR format (ADR-0002 stability contract is untouched), or any existing behavior.</p>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li>All six edges of the A ↔ B ↔ C triangle exist; the "3-way fungibility" claim becomes
+  literally true (with two documented limits) rather than aspirational.</li>
+<li>New workflows: import a hand-written or legacy Pydantic model into the XML-authoring
+  flow (<code>to_schema</code>); regenerate canonical, diffable XML from an edited IR or a model
+  (<code>dump_xml</code>); review a model as XML in a PR.</li>
+<li><code>to_schema</code> tracks Pydantic's own type→schema logic across releases instead of
+  duplicating it.</li>
+<li>The round-trip invariants <code>compile(dump_xml(ir)) == ir</code> (acyclic, union-free IR) and
+  <code>to_schema(from_schema(ir)) ≈ ir</code> become testable property-based guarantees, hardening
+  the IR contract in both directions.</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li><code>dump_xml</code> is a <strong>partial</strong> function. Cyclic/self-referential IR and non-null unions
+  raise rather than serialize. Callers must handle <code>SchemaError</code>, and the limitation is a
+  permanent property of the ADR-0001 convention, not a backlog item.</li>
+<li><code>to_schema</code> inherits whatever quirks <code>model_json_schema()</code> emits (e.g. Pydantic-added
+  <code>title</code> keys). The IR tolerates these, but <code>to_schema(from_schema(ir))</code> is equal only
+  <em>modulo</em> such additive noise — exact dict equality is not guaranteed.</li>
+<li>Two more names (<code>dump_xml</code>, <code>to_schema</code>) on the public surface raise the chance of
+  confusion with the adjacent <code>to_xml</code> and <code>to_json_schema</code>. Mitigated by docstrings but
+  not eliminated.</li>
+<li>More surface area is more API to keep stable under semver going forward.</li>
+</ul>
+<h3 id="neutral">Neutral</h3>
+<ul>
+<li>Implementation lives in new modules (<code>_decompile.py</code>, <code>_introspect.py</code>) so the Tier-2
+  protected <code>_schema.py</code> and <code>_models.py</code> are not touched. The only protected-file edit is
+  additive re-exports in the Tier-1 <code>__init__.py</code>, which requires explicit approval.</li>
+<li>The singularization fallback is factored out of <code>_serializers.py</code> into a shared helper;
+  behavior is unchanged, but the helper's location moves.</li>
+<li>Future changes to either function's failure-mode set (e.g. teaching <code>dump_xml</code> a new
+  expressible construct) are behavioral and should be recorded as a follow-up ADR or noted
+  against this one.</li>
+</ul>
+<h2 id="amendment-2026-06-11-implementation">Amendment (2026-06-11, implementation)</h2>
+<p>Recorded during implementation of this ADR. These are refinements discovered while
+building <code>to_schema</code> and <code>dump_xml</code>; they do not change the decision, only sharpen its
+edges.</p>
+<ul>
+<li>
+<p><strong><code>to_schema</code> restores <code>required: []</code>.</strong> Pydantic's <code>model_json_schema()</code> omits the
+  <code>required</code> key entirely on an object that has no required fields, whereas canonical
+  <code>compile()</code> IR always carries a <code>required</code> list (possibly empty) on every object node.
+  <code>to_schema</code> therefore restores <code>required: []</code> on any object node where Pydantic dropped
+  it, keeping <code>to_schema(from_schema(ir))</code> structurally symmetric with the canonical IR.</p>
+</li>
+<li>
+<p><strong>Round-trip equivalence is defined modulo <code>$ref</code>-inlining (not title noise alone).</strong>
+  <code>from_schema</code> builds every nested object into a real nested Pydantic <code>BaseModel</code>, and
+  Pydantic v2 <code>model_json_schema()</code> <em>unconditionally</em> hoists nested models into top-level
+  <code>$defs</code> + <code>$ref</code>. So <code>to_schema(from_schema(ir))</code> for any IR with a nested object is
+  <code>$ref</code>-bearing, while canonical <code>compile()</code> IR is fully inlined. The equivalence
+  <code>to_schema(from_schema(ir)) ≈ ir</code> is therefore asserted only <strong>after inlining <code>$defs</code>/<code>$ref</code>
+  on the <code>to_schema</code> side and stripping additive <code>title</code>/<code>default</code> keys</strong>. <code>to_schema</code> itself
+  does NOT inline — that remains <code>dump_xml</code>'s job (the Decision above). Only the <em>test
+  comparison</em> inlines. The fully-canonical round trip <code>compile(dump_xml(ir)) == ir</code> is, by
+  contrast, asserted as exact dict equality.</p>
+</li>
+<li>
+<p><strong><code>dump_xml</code> accepts both nullable shapes.</strong> The nullable pattern is recognized in both
+  <code>anyOf:[T, {type:null}]</code> (what <code>_schema._wrap_nullable</code> emits) and <code>type:[T, "null"]</code>
+  (what <code>to_json_schema(strict=True)</code> and some foreign IR emit); both map to
+  <code>nullable="true"</code> plus the inner type's attributes.</p>
+</li>
+<li>
+<p><strong>Out-of-vocabulary keyword handling.</strong> <code>format</code> and <code>additionalProperties</code> are <strong>dropped</strong>
+  (no annotation-convention equivalent; lossy but non-fatal, mirroring the strict-export drops
+  of ADR-0010). <code>const</code> is <strong>rejected</strong> with <code>SchemaError</code> — dropping it would silently lose a
+  value constraint rather than a presentational hint.</p>
+</li>
+<li>
+<p><strong>Neutral <code>$ref</code> resolution core.</strong> The local-<code>$ref</code> resolution logic was factored out of
+  <code>_export</code> into <code>_refs.py</code> with caller-agnostic error wording, so <code>dump_xml</code> failures do not
+  emit <code>_export</code>'s strict-mode-specific phrasing. <code>_export</code> wraps the neutral core to keep its
+  own message text. This guarantees forward (<code>_export</code>) and reverse (<code>_decompile</code>) inlining
+  cannot drift.</p>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

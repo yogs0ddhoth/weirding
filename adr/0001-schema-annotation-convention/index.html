@@ -1,0 +1,928 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="XML ↔ Pydantic v2 conversion for structured AI output workflows">
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>0001: Schema Annotation Convention — Plain Unnamespaced Attributes - weirding</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#0001-schema-annotation-convention-plain-unnamespaced-attributes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="weirding" class="md-header__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            weirding
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              0001: Schema Annotation Convention — Plain Unnamespaced Attributes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="weirding" class="md-nav__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    weirding
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/langchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LangChain & LangGraph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/openai-azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI & Azure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/open-weight/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Open-weight (vLLM/Ollama)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/databricks-pyspark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks & PySpark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#canonical-attribute-vocabulary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Canonical attribute vocabulary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#array-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Array representation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-inference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Object inference
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-element" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root element
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avoided-attribute-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Avoided attribute names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consequences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consequences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positive
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neutral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neutral
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="0001-schema-annotation-convention-plain-unnamespaced-attributes">0001: Schema Annotation Convention — Plain Unnamespaced Attributes</h1>
+<p><strong>Status:</strong> Accepted</p>
+<p><strong>Date:</strong> 2026-05-06</p>
+<p><strong>Authors:</strong> Ben Lin</p>
+<h2 id="context">Context</h2>
+<p>weirding requires a schema format that AI engineers use to define the XML structure they
+want an LLM to produce. The schema serves two roles simultaneously: it is the compiler
+input that produces a JSON Schema IR dict, and it is the source of the prompt template
+shown to the LLM. These two roles create a tight constraint: the schema format must be
+both machine-readable and LLM-legible.</p>
+<p>Four annotation strategies were evaluated:</p>
+<p><strong><code>data-*</code> attributes</strong> (<code>&lt;field data-type="string" data-required="true"/&gt;</code>)
+The Lithium prototype used this convention. <code>data-*</code> is an HTML5 attribute convention
+that is meaningful in browser/DOM contexts and reads oddly in enterprise XML documents.
+It signals "HTML metadata" to any XML engineer encountering the file, which is the wrong
+frame. Non-HTML XML validators will pass the attributes but the semantics are alien.
+Rejected: wrong register for enterprise XML; no technical advantage over plain attributes.</p>
+<p><strong>Namespace-prefixed attributes</strong> (<code>&lt;field r:type="string" r:required="true"/&gt;</code>)
+Namespace prefixes are the "standard" XML annotation mechanism for adding metadata from
+an external vocabulary. Two blocking findings rule this out. First, Anthropic's ANTML
+(their internal XML tool-calling format) uses namespace prefixes internally but strips
+them at the API boundary in both directions — confirming that Claude cannot reliably
+round-trip namespace prefixes. A schema using <code>r:type</code> will generate a prompt template
+with <code>r:type</code>, which the model cannot faithfully reproduce. Second, Office Open XML
+(a primary enterprise document target) exhausts every common single-letter namespace
+prefix (<code>w:</code>, <code>r:</code>, <code>a:</code>, <code>p:</code>, <code>b:</code>, <code>c:</code>, <code>d:</code>, <code>f:</code>, <code>m:</code>, <code>o:</code>, <code>s:</code>, <code>t:</code>, <code>v:</code>,
+<code>x:</code>). Any prefix weirding chose would collide with OOXML in mixed-document scenarios.
+Rejected: LLM round-trip failure; namespace collision in enterprise XML.</p>
+<p><strong>XSD as primary schema format</strong>
+XSD can express object, array, optional, and scalar types using <code>xs:complexType</code>,
+<code>xs:sequence</code>, <code>xs:element</code>, <code>minOccurs</code>, <code>maxOccurs</code>. Research (dispatched May 2026)
+found three blocking issues. First, no maintained Python runtime library converts XSD to
+JSON Schema dict — weirding would own 100% of a multi-week semantic analysis engine
+covering type derivation, substitution groups, cross-file imports, and nillable handling.
+Second, the LLM prompt template workflow breaks: an XSD document for a 4-field object is
+20+ lines of <code>xs:complexType/xs:sequence</code> markup, is context-budget waste, and inverts
+the instance/schema relationship — LLMs are not trained to produce XML guided by XSD
+grammar. Third, three weirding invariants (null types, <code>additionalProperties: false</code>,
+<code>prefixItems</code> ban) have no clean XSD representation — workarounds require custom XSD
+extensions, which is exactly a custom DSL with more moving parts.
+XSD remains the correct Phase 03 extra for enterprise schema <em>import</em>; it is not the
+right primary authoring format for LLM engineering workflows.</p>
+<p><strong>Plain unnamespaced attributes</strong> (<code>&lt;field type="string" required="false"/&gt;</code>)
+Anthropic's own XML prompt engineering documentation uses this pattern: <code>index="n"</code>,
+<code>weight="high"</code>, <code>source="filename"</code> — plain unnamespaced attributes with no prefix or
+HTML convention. The attributes survive ANTML stripping. The schema document itself is
+the LLM prompt template at near-zero transformation cost. The compiler is attribute
+dispatch — O(number of supported attributes) — with no semantic analysis.</p>
+<h2 id="decision">Decision</h2>
+<p>weirding's native annotation dialect uses <strong>plain unnamespaced attributes</strong> on XML
+elements to convey JSON Schema semantics. The element tag is the field name; the
+attributes carry type and constraint metadata.</p>
+<h3 id="canonical-attribute-vocabulary">Canonical attribute vocabulary</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>JSON Schema mapping</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td><code>type</code></td>
+<td>Values: <code>string</code>, <code>number</code>, <code>integer</code>, <code>boolean</code>, <code>object</code>, <code>array</code>, <code>null</code>. Default: inferred from children (object if children present, string otherwise).</td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td>entry in parent <code>required</code> array</td>
+<td>Boolean string <code>"true"</code> / <code>"false"</code>. Default: <code>"true"</code>.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>description</code></td>
+<td>Human-readable; included verbatim in IR and prompt template.</td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>enum</code></td>
+<td>Pipe-separated values: <code>"red\|green\|blue"</code>.</td>
+</tr>
+<tr>
+<td><code>pattern</code></td>
+<td><code>pattern</code></td>
+<td>ECMAScript-compatible regex string.</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>minimum</code></td>
+<td>Numeric lower bound (inclusive). For integers and numbers.</td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>maximum</code></td>
+<td>Numeric upper bound (inclusive).</td>
+</tr>
+<tr>
+<td><code>min</code></td>
+<td><code>minLength</code> / <code>minItems</code></td>
+<td>For <code>type="string"</code>: <code>minLength</code>. For <code>type="array"</code>: <code>minItems</code>.</td>
+</tr>
+<tr>
+<td><code>max</code></td>
+<td><code>maxLength</code> / <code>maxItems</code></td>
+<td>For <code>type="string"</code>: <code>maxLength</code>. For <code>type="array"</code>: <code>maxItems</code>.</td>
+</tr>
+<tr>
+<td><code>default</code></td>
+<td><code>default</code></td>
+<td>Literal default value; type must be consistent with <code>type</code> attribute.</td>
+</tr>
+<tr>
+<td><code>nullable</code></td>
+<td><code>type</code> promoted to <code>["T", "null"]</code></td>
+<td>Boolean string. Applies alongside the <code>type</code> attribute.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="array-representation">Array representation</h3>
+<p>Arrays use <code>type="array"</code> on the parent element with a single child element as the item
+template. The child element defines the schema for each item.</p>
+<pre><code class="language-xml">&lt;tags type=&quot;array&quot;&gt;
+  &lt;tag type=&quot;string&quot;/&gt;
+&lt;/tags&gt;
+</code></pre>
+<p>Compiles to:</p>
+<pre><code class="language-json">{&quot;tags&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}}}
+</code></pre>
+<p>Arrays of objects: the child element has its own children.</p>
+<pre><code class="language-xml">&lt;results type=&quot;array&quot;&gt;
+  &lt;result&gt;
+    &lt;title type=&quot;string&quot;/&gt;
+    &lt;score type=&quot;number&quot; required=&quot;false&quot;/&gt;
+  &lt;/result&gt;
+&lt;/results&gt;
+</code></pre>
+<h3 id="object-inference">Object inference</h3>
+<p>An element with child elements and no explicit <code>type</code> attribute is inferred as
+<code>type="object"</code>. This is the default for structured fields. <code>type="object"</code> may be
+stated explicitly for clarity.</p>
+<h3 id="root-element">Root element</h3>
+<p>The root element tag becomes the Pydantic model class name (sanitized to a valid Python
+identifier). It is not a field — its children are the top-level fields.</p>
+<h3 id="avoided-attribute-names">Avoided attribute names</h3>
+<p><code>id</code>, <code>ref</code>, <code>name</code>, <code>base</code>, <code>use</code>, <code>form</code>, <code>nillable</code>, <code>abstract</code>, <code>block</code>,
+<code>substitutionGroup</code> are XSD-reserved or conventionally meaningful in XML schema contexts.
+Do not add these to the weirding vocabulary without an ADR.</p>
+<h3 id="scope">Scope</h3>
+<p>This convention applies to the <strong>weirding native annotation dialect</strong> only. XSD documents
+are a separate dialect (Phase 03, <code>weirding[xsd]</code> extra) and are parsed by a different
+compiler path. A weirding native annotation document and an XSD document are mutually
+exclusive inputs to <code>compile()</code>.</p>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li>Schema documents are directly usable as LLM prompt templates with no transformation.
+  <code>prompt.to_template()</code> renders the element tree with type annotations as XML text,
+  which is the exact format shown to the LLM.</li>
+<li>Compiler is simple: attribute dispatch with no semantic analysis graph. Test surface
+  is linear in the attribute vocabulary.</li>
+<li>No namespace machinery. Documents load cleanly in any XML editor or validator.</li>
+<li>Anthropic XML prompt engineering best practices confirm this pattern: Claude produces
+  higher-quality structured output when guided by readable example XML, not grammar
+  documents.</li>
+<li>OOXML and SOAP documents (enterprise targets) can coexist in the same project without
+  prefix collision.</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li>Not a recognized standard. Enterprise XML tooling (oXygen, VS Code XML extension) will
+  validate the documents as well-formed XML but will not provide attribute-level
+  completion or semantic validation for weirding-specific attributes.</li>
+<li><code>type</code> and <code>required</code> are common English words. If a user's actual data model has a
+  field genuinely named <code>type</code> or <code>required</code>, the attribute convention creates an
+  ambiguity that must be resolved by escaping or renaming. (Mitigation: document this
+  explicitly and provide guidance on renaming data fields.)</li>
+</ul>
+<h3 id="neutral">Neutral</h3>
+<ul>
+<li><code>data-*</code> attributes from the Lithium prototype (<code>xml-pydantic</code>) are <strong>not</strong> ported.
+  Any port of prototype logic must replace <code>data-type</code>, <code>data-required</code>, etc. with the
+  plain attribute equivalents defined here.</li>
+<li>Future additions to the attribute vocabulary require an ADR update or a new ADR. The
+  vocabulary is intentionally narrow to keep the compiler surface auditable.</li>
+<li>XSD schema documents fed to <code>compile()</code> are detected by the presence of the
+  <code>{http://www.w3.org/2001/XMLSchema}schema</code> root element and routed to the XSD compiler
+  path (Phase 03). This detection logic is the correct scope for the XSD-native path.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

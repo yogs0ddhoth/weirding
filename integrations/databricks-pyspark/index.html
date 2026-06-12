@@ -1,0 +1,914 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="XML ↔ Pydantic v2 conversion for structured AI output workflows">
+      
+      
+      
+      
+        <link rel="prev" href="../open-weight/">
+      
+      
+        <link rel="next" href="../../adr/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Databricks & PySpark - weirding</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#databricks-pyspark" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="weirding" class="md-header__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            weirding
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Databricks & PySpark
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="weirding" class="md-nav__button md-logo" aria-label="weirding" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    weirding
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yogs0ddhoth/weirding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../langchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LangChain & LangGraph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openai-azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI & Azure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../open-weight/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Open-weight (vLLM/Ollama)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks & PySpark
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks & PySpark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-a-native-ai_query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern A — native ai_query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-b-byo-client-in-a-batch-udf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern B — BYO client in a batch UDF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pattern B — BYO client in a batch UDF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-the-model-inside-the-udf-closure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the model inside the UDF closure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydantic-spark-structtype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pydantic → Spark StructType
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gotchas-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gotchas summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-a-native-ai_query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern A — native ai_query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-b-byo-client-in-a-batch-udf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern B — BYO client in a batch UDF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pattern B — BYO client in a batch UDF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-the-model-inside-the-udf-closure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the model inside the UDF closure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydantic-spark-structtype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pydantic → Spark StructType
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gotchas-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gotchas summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="databricks-pyspark">Databricks &amp; PySpark</h1>
+<p>weirding fits two Databricks patterns for structured LLM output over Spark DataFrames: the
+native <code>ai_query</code> SQL/Python function, and a bring-your-own-client batch UDF. Both consume
+a schema you author once in XML. Databricks <code>ai_query</code>'s <code>responseFormat</code> is the strictest
+schema consumer weirding targets, and <code>weirding.to_json_schema(ir, strict=True)</code> produces
+exactly the OpenAI ∩ Databricks intersection it accepts.</p>
+<p>!!! danger "Privacy: never log raw inputs or full responses"
+    Every example here logs only <strong>validation outcomes and counts</strong> — never raw row inputs
+    or full LLM responses. In Spark, a <code>print</code>/<code>logger.info</code> of row data writes user content
+    to <strong>executor logs and the Spark UI</strong>, keyed by partition, where it persists outside
+    your control. This is a privacy violation under weirding's no-PII-in-logs policy
+    (MEMORY.md rule 2, ETHOS.md "privacy by architecture").</p>
+<pre><code>Note specifically that `prompt.format_error` and `RetryContext.retry_message()` describe
+*which fields* failed and *why*, and their messages can embed offending field values in
+some validator messages. **Do not persist `format_error` / `RetryContext` output to
+logs or to a DataFrame column.** Send it back to the model in-memory for the retry only.
+`format_error` already runs with `include_input=False` to minimize this exposure, but
+treat its output as potentially user-derived regardless.
+</code></pre>
+<h2 id="pattern-a-native-ai_query">Pattern A — native <code>ai_query</code></h2>
+<p>Use the strict export as the <code>responseFormat</code> JSON schema. Strict mode produces the
+Databricks-valid intersection (<code>additionalProperties:false</code>, all-<code>required</code>, nullable
+collapsed to <code>[T,"null"]</code>, refs inlined, unsupported keywords stripped).</p>
+<pre><code class="language-python">import json
+import weirding
+from pyspark.sql import functions as F
+
+SCHEMA_XML = &quot;&quot;&quot;
+&lt;Triage description=&quot;Support ticket triage result&quot;&gt;
+  &lt;priority type=&quot;string&quot; required=&quot;true&quot; enum=&quot;low|medium|high&quot;/&gt;
+  &lt;category type=&quot;string&quot; required=&quot;true&quot;/&gt;
+&lt;/Triage&gt;
+&quot;&quot;&quot;
+
+ir = weirding.compile(SCHEMA_XML)
+schema = weirding.to_json_schema(ir, strict=True)
+response_format = json.dumps({
+    &quot;type&quot;: &quot;json_schema&quot;,
+    &quot;json_schema&quot;: {&quot;name&quot;: &quot;Triage&quot;, &quot;schema&quot;: schema, &quot;strict&quot;: True},
+})
+
+df = spark.table(&quot;support_tickets&quot;)  # noqa: F821 (Databricks-provided)
+result = df.withColumn(
+    &quot;triage&quot;,
+    F.expr(
+        &quot;ai_query(&quot;
+        &quot;  'databricks-meta-llama-3-3-70b-instruct',&quot;
+        &quot;  request =&gt; body,&quot;
+        f&quot;  responseFormat =&gt; '{response_format}',&quot;
+        &quot;  failOnError =&gt; false&quot;  # do not fail the whole job on one bad row
+        &quot;)&quot;
+    ),
+)
+</code></pre>
+<p><strong>Caveats:</strong></p>
+<ul>
+<li><strong>64-key cap.</strong> <code>ai_query</code> schemas are limited to 64 total keys.
+  <code>to_json_schema(strict=True)</code> raises <code>weirding.SchemaError</code> if the transformed schema
+  exceeds this, rather than emitting a schema Databricks would reject — keep your schema
+  small.</li>
+<li><strong>No per-row retry.</strong> <code>ai_query</code> has no built-in retry. Use <code>failOnError =&gt; false</code> so a
+  single malformed row yields a null/error column instead of failing the job, then handle
+  failures downstream. Inspect counts of failed rows — not their contents.</li>
+</ul>
+<h2 id="pattern-b-byo-client-in-a-batch-udf">Pattern B — BYO client in a batch UDF</h2>
+<p>When you call an LLM client yourself (custom endpoint, retry policy, your own provider), run
+it inside a <code>pandas_udf</code> or <code>mapInPandas</code>. The key constraint is <strong>executor serialization</strong>.</p>
+<h3 id="build-the-model-inside-the-udf-closure">Build the model inside the UDF closure</h3>
+<p>weirding builds models dynamically via <code>type(...)</code>, so the <strong>class object cannot be pickled
+by qualified name</strong> and shipped driver → executor. Build it <strong>inside the partition closure</strong>
+instead. <code>define_model(...)</code> is cheap for 1–50KB payloads, so compiling once per partition
+is negligible.</p>
+<pre><code class="language-python">import pandas as pd
+from pyspark.sql.functions import pandas_udf
+from pyspark.sql.types import StringType
+
+SCHEMA_XML = &quot;&quot;&quot;...&quot;&quot;&quot;  # the XML schema string is picklable; the model class is not
+MAX_RETRIES = 3         # HARD cap — see speculative-execution note below
+
+@pandas_udf(StringType())
+def triage_udf(messages: pd.Series) -&gt; pd.Series:
+    import weirding
+    from weirding import prompt
+
+    # Build the model PER PARTITION, inside the closure — never serialize the class.
+    Triage = weirding.define_model(SCHEMA_XML)
+
+    out: list[str | None] = []
+    ok = 0
+    failed = 0
+    for raw_text in messages:
+        ctx = prompt.RetryContext(Triage, max_attempts=MAX_RETRIES)
+        validated = None
+        while not ctx.exceeded:                      # bounded by MAX_RETRIES
+            user_msg = raw_text
+            if ctx.attempt:
+                # retry_message stays in memory for the model only — never logged
+                user_msg = raw_text + &quot;\n\n&quot; + ctx.retry_message()
+            response = call_your_llm(user_msg)       # your client call
+            try:
+                validated = weirding.parse(response, Triage)
+                break
+            except weirding.ParseError as exc:
+                ctx.record_error(exc)                # do NOT log exc / its message
+        if validated is not None:
+            ok += 1
+            out.append(validated.model_dump_json())
+        else:
+            failed += 1
+            out.append(None)
+    # PRIVACY-SAFE: log counts only, never row text or responses
+    # logger.info(&quot;partition done: ok=%d failed=%d&quot;, ok, failed)  # counts only
+    return pd.Series(out)
+
+df = spark.table(&quot;support_tickets&quot;)  # noqa: F821
+result = df.withColumn(&quot;triage_json&quot;, triage_udf(df[&quot;body&quot;]))
+</code></pre>
+<p><strong>Why the hard retry cap matters:</strong> Spark <strong>speculative execution</strong> can launch duplicate
+task attempts for slow partitions. Unbounded retries inside a UDF amplify this — duplicate
+attempts each burn the full retry budget, multiplying LLM calls and cost. Always cap retries
+(<code>MAX_RETRIES</code> above) and prefer idempotent handling.</p>
+<p>Recommend <strong><code>pydantic&gt;=2.5</code></strong> on the cluster for stable model-construction behavior in the
+executor environment.</p>
+<h3 id="pydantic-spark-structtype">Pydantic → Spark <code>StructType</code></h3>
+<p>If you need a typed Spark <code>StructType</code> (rather than a JSON string column) from the
+weirding-generated model, delegate to <strong><a href="https://pypi.org/project/sparkdantic/"><code>sparkdantic</code></a></strong>:</p>
+<pre><code class="language-python">from sparkdantic import create_spark_schema
+
+Triage = weirding.define_model(SCHEMA_XML)
+struct_type = create_spark_schema(Triage)  # StructType for use with from_json / schemas
+</code></pre>
+<p>weirding intentionally does <strong>not</strong> add a PySpark dependency — that would re-introduce a
+binary-compatibility liability on the cluster (MEMORY.md rule 6). <code>sparkdantic</code> is the
+right place for the Pydantic → Spark mapping.</p>
+<h2 id="gotchas-summary">Gotchas summary</h2>
+<ul>
+<li>Build the weirding model <strong>inside</strong> the UDF/partition closure; never serialize the class.</li>
+<li>Cap retries hard; speculative execution can duplicate task attempts.</li>
+<li>Log <strong>counts only</strong> — never row inputs, LLM responses, or <code>format_error</code>/<code>retry_message</code>
+  output.</li>
+<li><code>ai_query</code> has no per-row retry; use <code>failOnError =&gt; false</code>.</li>
+<li>Strict-mode schemas are capped at 64 keys (raises <code>SchemaError</code> if exceeded).</li>
+<li>Delegate <code>StructType</code> generation to <code>sparkdantic</code>; weirding adds no PySpark dependency.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
